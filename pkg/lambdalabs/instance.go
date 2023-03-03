@@ -19,6 +19,10 @@ type CreateInstancePayload struct {
 	SSHKeyNames      []string `json:"ssh_key_names"`
 }
 
+type TerminateInstancePayload struct {
+	IDs []string `json:"instance_ids"`
+}
+
 func (c *Client) GetInstance(id string) (*Instance, error) {
 	resp, err := c.Get("/instances/"+id, nil)
 	if err != nil {
@@ -66,4 +70,26 @@ func (c *Client) CreateInstance(regionName, instanceTypeName string, sshKeyNames
 	}
 
 	return instance, nil
+}
+
+func (c *Client) TerminateInstance(id string) (*Instance, error) {
+	body, err := json.Marshal(TerminateInstancePayload{IDs: []string{id}})
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.Post("/instance-operations/terminate", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err = io.ReadAll(resp.Body)
+	var data struct {
+		Data struct {
+			Instances []*Instance `json:"terminated_instances"`
+		} `json:"data"`
+	}
+	json.Unmarshal(body, &data)
+
+	return data.Data.Instances[0], nil
 }

@@ -141,6 +141,23 @@ func (r *instanceResource) Update(ctx context.Context, req resource.UpdateReques
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	// Retrieve values from state
+	var state instanceModel
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Delete existing order
+	_, err := r.client.TerminateInstance(state.ID.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Deleting instance",
+			"Could not delete instance, unexpected error: "+err.Error(),
+		)
+		return
+	}
 }
 
 func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string) (*api.Instance, error) {
