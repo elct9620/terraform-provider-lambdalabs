@@ -161,6 +161,10 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *instanceResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+	resp.Diagnostics.AddError(
+		"Error Update Lambdalabs instance",
+		"Unsupported Method",
+	)
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
