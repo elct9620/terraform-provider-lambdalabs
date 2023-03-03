@@ -98,7 +98,7 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	createdInstance, err := r.client.CreateInstance(
+	createdInstance, err := r.client.LaunchInstance(
 		instance.RegionName.ValueString(),
 		instance.InstanceTypeName.ValueString(),
 		keyNames,

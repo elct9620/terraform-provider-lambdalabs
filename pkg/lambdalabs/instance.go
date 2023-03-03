@@ -13,7 +13,7 @@ type Instance struct {
 	Status string `json:"status"`
 }
 
-type CreateInstancePayload struct {
+type LaunchInstancePayload struct {
 	RegionName       string   `json:"region_name"`
 	InstanceTypeName string   `json:"instance_type_name"`
 	SSHKeyNames      []string `json:"ssh_key_names"`
@@ -45,8 +45,8 @@ func (c *Client) GetInstance(id string) (*Instance, error) {
 	return data.Data, nil
 }
 
-func (c *Client) CreateInstance(regionName, instanceTypeName string, sshKeyNames []string) (*Instance, error) {
-	body, err := json.Marshal(CreateInstancePayload{RegionName: regionName, InstanceTypeName: instanceTypeName, SSHKeyNames: sshKeyNames})
+func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames []string) (*Instance, error) {
+	body, err := json.Marshal(LaunchInstancePayload{RegionName: regionName, InstanceTypeName: instanceTypeName, SSHKeyNames: sshKeyNames})
 	if err != nil {
 		return nil, err
 	}
