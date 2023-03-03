@@ -133,6 +133,30 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 
 // Read refreshes the Terraform state with the latest data.
 func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+	var state instanceModel
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	latestInstance, err := r.client.GetInstance(state.ID.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Reading Lambdalabs SSH Key",
+			"Could not find Lambdalabs SSH Key ID "+state.ID.ValueString()+": "+err.Error(),
+		)
+		return
+	}
+
+	state.IP = types.StringValue(latestInstance.IP)
+
+	// Set refreshed state
+	diags = resp.State.Set(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 }
 
 // Update updates the resource and sets the updated Terraform state on success.
