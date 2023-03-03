@@ -94,5 +94,7 @@ func (p *lambdalabsProvider) DataSources(_ context.Context) []func() datasource.
 }
 
 func (p *lambdalabsProvider) Resources(_ context.Context) []func() resource.Resource {
-	return nil
+	return []func() resource.Resource{
+		NewSSHKeyResource,
+	}
 }
