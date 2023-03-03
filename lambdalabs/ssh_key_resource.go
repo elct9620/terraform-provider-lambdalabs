@@ -76,10 +76,10 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	var createdKey *api.SSHKey
 	var err error
-	if key.PublicKey.String() == "" {
-		createdKey, err = r.client.CreateSSHKey(key.Name.String())
+	if key.PublicKey.ValueString() == "" {
+		createdKey, err = r.client.CreateSSHKey(key.Name.ValueString())
 	} else {
-		createdKey, err = r.client.CreateSSHKeyWithPublicKey(key.Name.String(), key.PublicKey.String())
+		createdKey, err = r.client.CreateSSHKeyWithPublicKey(key.Name.ValueString(), key.PublicKey.ValueString())
 	}
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	key, err := r.client.GetSSHKey(state.ID.String())
+	key, err := r.client.GetSSHKey(state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Lambdalabs SSH Key",

@@ -1,6 +1,11 @@
 package lambdalabs
 
-import "errors"
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"io"
+)
 
 var (
 	ErrSSHKeyNotFound = errors.New("SSH Key not exists")
@@ -13,8 +18,35 @@ type SSHKey struct {
 	PrivateKey string `json:"private_key"`
 }
 
+type CreateSSHKeyPayload struct {
+	Name string `json:"name"`
+}
+
+type CreateSSHKeyWithPKeyPayload struct {
+	Name      string `json:"name"`
+	PublicKey string `json:"public_key"`
+}
+
 func (c *Client) ListSSHKeys() ([]*SSHKey, error) {
-	return []*SSHKey{}, nil
+	resp, err := c.Get("/ssh-keys", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var data struct {
+		Data []*SSHKey `json:"data"`
+	}
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data.Data, nil
 }
 
 func (c *Client) GetSSHKey(id string) (*SSHKey, error) {
@@ -33,9 +65,41 @@ func (c *Client) GetSSHKey(id string) (*SSHKey, error) {
 }
 
 func (c *Client) CreateSSHKey(name string) (*SSHKey, error) {
-	return &SSHKey{}, nil
+	body, err := json.Marshal(CreateSSHKeyPayload{Name: name})
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.Post("/ssh-keys", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err = io.ReadAll(resp.Body)
+	var data struct {
+		Data *SSHKey `json:"data"`
+	}
+	json.Unmarshal(body, &data)
+
+	return data.Data, nil
 }
 
 func (c *Client) CreateSSHKeyWithPublicKey(name, publicKey string) (*SSHKey, error) {
-	return &SSHKey{}, nil
+	body, err := json.Marshal(CreateSSHKeyWithPKeyPayload{Name: name, PublicKey: publicKey})
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.Post("/ssh-keys", bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err = io.ReadAll(resp.Body)
+	var data struct {
+		Data *SSHKey `json:"data"`
+	}
+	json.Unmarshal(body, &data)
+
+	return data.Data, nil
 }
