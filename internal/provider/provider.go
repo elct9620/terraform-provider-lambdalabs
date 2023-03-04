@@ -39,6 +39,7 @@ func (p *lambdalabsProvider) Metadata(_ context.Context, _ provider.MetadataRequ
 
 func (p *lambdalabsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
+		MarkdownDescription: "Manage Lambdalabs Cloud GPU",
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
 				MarkdownDescription: "The Lambdalabs API Endpoint",

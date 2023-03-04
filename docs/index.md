@@ -3,12 +3,12 @@
 page_title: "lambdalabs Provider"
 subcategory: ""
 description: |-
-  
+  Manage Lambdalabs Cloud GPU
 ---
 
 # lambdalabs Provider
 
-
+Manage Lambdalabs Cloud GPU
 
 
 

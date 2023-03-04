@@ -7,3 +7,6 @@ testacc:
 
 install:
 	go install .
+
+doc:
+	go generate ./...
