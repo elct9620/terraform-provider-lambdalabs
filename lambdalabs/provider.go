@@ -17,18 +17,21 @@ var (
 	_ provider.Provider = &lambdalabsProvider{}
 )
 
-type lambdalabsProvider struct{}
+type lambdalabsProvider struct {
+	version string
+}
 
 type lambdalabsProviderModel struct {
 	ApiKey types.String `tfsdk:"api_key"`
 }
 
-func New() provider.Provider {
-	return &lambdalabsProvider{}
+func New(version string) provider.Provider {
+	return &lambdalabsProvider{version}
 }
 
 func (p *lambdalabsProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "lambdalabs"
+	resp.Version = p.version
 }
 
 func (p *lambdalabsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
