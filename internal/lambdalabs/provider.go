@@ -25,8 +25,10 @@ type lambdalabsProviderModel struct {
 	ApiKey types.String `tfsdk:"api_key"`
 }
 
-func New(version string) provider.Provider {
-	return &lambdalabsProvider{version}
+func New(version string) func() provider.Provider {
+	return func() provider.Provider {
+		return &lambdalabsProvider{version}
+	}
 }
 
 func (p *lambdalabsProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {

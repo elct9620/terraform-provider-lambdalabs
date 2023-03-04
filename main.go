@@ -6,7 +6,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/elct9620/terraform-provider-lambdalabs/lambdalabs"
+	"github.com/elct9620/terraform-provider-lambdalabs/internal/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
