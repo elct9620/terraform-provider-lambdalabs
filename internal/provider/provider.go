@@ -22,7 +22,8 @@ type lambdalabsProvider struct {
 }
 
 type lambdalabsProviderModel struct {
-	ApiKey types.String `tfsdk:"api_key"`
+	Endpoint types.String `tfsdk:"endpoint"`
+	ApiKey   types.String `tfsdk:"api_key"`
 }
 
 func New(version string) func() provider.Provider {
@@ -39,6 +40,10 @@ func (p *lambdalabsProvider) Metadata(_ context.Context, _ provider.MetadataRequ
 func (p *lambdalabsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
+			"endpoint": schema.StringAttribute{
+				MarkdownDescription: "The Lambdalabs API Endpoint",
+				Optional:            true,
+			},
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "The API Key from Lambdalabs",
 				Optional:            true,
@@ -56,6 +61,15 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
+	if config.Endpoint.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("endpoint"),
+			"Unknown Lambdalabs API Endpoint",
+			"The provider cannot create the Lambdalabs API client as there is an unknown configuration value for the Lambdalabs API Endpoint. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the LAMBDALABS_ENDPOINT environment variable.",
+		)
+	}
+
 	if config.ApiKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
@@ -69,10 +83,19 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
+	endpoint := os.Getenv("LAMBDALABS_ENDPOINT")
 	apiKey := os.Getenv("LAMBDALABS_API_KEY")
+
+	if !config.Endpoint.IsNull() {
+		endpoint = config.Endpoint.ValueString()
+	}
 
 	if !config.ApiKey.IsNull() {
 		apiKey = config.ApiKey.ValueString()
+	}
+
+	if endpoint == "" {
+		endpoint = api.Endpoint
 	}
 
 	if apiKey == "" {
@@ -89,7 +112,7 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
-	client := api.New(apiKey)
+	client := api.New(apiKey, api.WithEndpoint(endpoint))
 
 	resp.DataSourceData = client
 	resp.ResourceData = client

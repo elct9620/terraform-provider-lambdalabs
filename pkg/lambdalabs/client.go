@@ -15,19 +15,35 @@ var (
 )
 
 type Client struct {
-	apiKey string
-	http   *http.Client
+	apiKey   string
+	endpoint string
+	http     *http.Client
 }
 
-func New(apiKey string) *Client {
-	return &Client{
-		apiKey: apiKey,
-		http:   &http.Client{},
+type ClientOption = func(c *Client)
+
+func New(apiKey string, options ...ClientOption) *Client {
+	client := &Client{
+		endpoint: Endpoint,
+		apiKey:   apiKey,
+		http:     &http.Client{},
+	}
+
+	for _, option := range options {
+		option(client)
+	}
+
+	return client
+}
+
+func WithEndpoint(endpoint string) ClientOption {
+	return func(c *Client) {
+		c.endpoint = endpoint
 	}
 }
 
 func (c *Client) Get(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("GET", Endpoint+path, body)
+	req, err := http.NewRequest("GET", c.endpoint+path, body)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +66,7 @@ func (c *Client) Get(path string, body io.Reader) (*http.Response, error) {
 }
 
 func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("POST", Endpoint+path, body)
+	req, err := http.NewRequest("POST", c.endpoint+path, body)
 	if err != nil {
 		return nil, err
 	}
