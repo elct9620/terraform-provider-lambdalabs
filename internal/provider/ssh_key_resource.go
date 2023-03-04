@@ -125,15 +125,13 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	newState := sshKeyModel{
-		ID:         types.StringValue(key.ID),
-		Name:       types.StringValue(key.Name),
-		PublicKey:  types.StringValue(key.PublicKey),
-		PrivateKey: types.StringValue(key.PrivateKey),
-	}
+	state.ID = types.StringValue(key.ID)
+	state.Name = types.StringValue(key.Name)
+	state.PublicKey = types.StringValue(key.PublicKey)
+	state.PrivateKey = types.StringValue(key.PrivateKey)
 
 	// Set refreshed state
-	diags = resp.State.Set(ctx, &newState)
+	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -142,15 +140,15 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddError(
-		"Error Update Lambdalabs SSH Key",
+	resp.Diagnostics.AddWarning(
+		"Update Lambdalabs SSH Key",
 		"Unsupported Method",
 	)
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	resp.Diagnostics.AddError(
+	resp.Diagnostics.AddWarning(
 		"Error Delete Lambdalabs SSH Key",
 		"Unsupported Method",
 	)
