@@ -57,12 +57,19 @@ func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames
 	}
 
 	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var data struct {
 		Data struct {
 			IDs []string `json:"instance_ids"`
 		} `json:"data"`
 	}
-	json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
 
 	instance, err := c.GetInstance(data.Data.IDs[0])
 	if err != nil {
@@ -84,12 +91,19 @@ func (c *Client) TerminateInstance(id string) (*Instance, error) {
 	}
 
 	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var data struct {
 		Data struct {
 			Instances []*Instance `json:"terminated_instances"`
 		} `json:"data"`
 	}
-	json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
 
 	return data.Data.Instances[0], nil
 }

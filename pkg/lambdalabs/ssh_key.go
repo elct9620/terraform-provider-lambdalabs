@@ -76,10 +76,17 @@ func (c *Client) CreateSSHKey(name string) (*SSHKey, error) {
 	}
 
 	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var data struct {
 		Data *SSHKey `json:"data"`
 	}
-	json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
 
 	return data.Data, nil
 }
@@ -96,10 +103,17 @@ func (c *Client) CreateSSHKeyWithPublicKey(name, publicKey string) (*SSHKey, err
 	}
 
 	body, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var data struct {
 		Data *SSHKey `json:"data"`
 	}
-	json.Unmarshal(body, &data)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return nil, err
+	}
 
 	return data.Data, nil
 }

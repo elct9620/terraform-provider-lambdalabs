@@ -213,7 +213,7 @@ func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string) (
 		Timeout: instanceCreateTimeout,
 		Delay:   instanceCreateDelay,
 	}
-	raw, err := changeConfig.WaitForState()
+	raw, err := changeConfig.WaitForStateContext(ctx)
 
 	if v, ok := raw.(*api.Instance); ok {
 		return v, err
