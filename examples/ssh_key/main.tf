@@ -13,6 +13,6 @@ resource "lambdalabs_ssh_key" "primary" {
 }
 
 output "key" {
-  value = lambdalabs_ssh_key.primary
+  value     = lambdalabs_ssh_key.primary
   sensitive = true
 }
