@@ -34,15 +34,14 @@ func Test_SSHKeyResource(t *testing.T) {
 				]
 			}
 			`
-			w.Write([]byte(resBody))
-			break
+			w.Write([]byte(resBody)) //nolint:errcheck
 		case "POST":
 			var input struct {
 				Name string `json:"name"`
 			}
 
 			body, _ := io.ReadAll(r.Body)
-			json.Unmarshal(body, &input)
+			json.Unmarshal(body, &input) //nolint:errcheck
 
 			resBody := fmt.Sprintf(`
 			{
@@ -54,8 +53,7 @@ func Test_SSHKeyResource(t *testing.T) {
 				}
 			}
 			`, input.Name)
-			w.Write([]byte(resBody))
-			break
+			w.Write([]byte(resBody)) //nolint:errcheck
 		default:
 			http.NotFoundHandler().ServeHTTP(w, r)
 		}

@@ -42,8 +42,7 @@ func Test_InstanceResource(t *testing.T) {
 				}
 			}
 			`
-			w.Write([]byte(resBody))
-			break
+			w.Write([]byte(resBody)) //nolint:errcheck
 		case "/instance-operations/launch":
 			resBody := `
 			{
@@ -54,8 +53,7 @@ func Test_InstanceResource(t *testing.T) {
 				}
 			}
 			`
-			w.Write([]byte(resBody))
-			break
+			w.Write([]byte(resBody)) //nolint:errcheck
 		case "/instance-operations/terminate":
 			resBody := `
 			{
@@ -75,8 +73,7 @@ func Test_InstanceResource(t *testing.T) {
 				}
 			}
 			`
-			w.Write([]byte(resBody))
-			break
+			w.Write([]byte(resBody)) //nolint:errcheck
 		}
 	}))
 
