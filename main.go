@@ -6,7 +6,7 @@ import (
 	"context"
 	"flag"
 
-	"github.com/elct9620/terraform-provider-lambdalabs/internal/lambdalabs"
+	"github.com/elct9620/terraform-provider-lambdalabs/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
@@ -25,5 +25,5 @@ func main() {
 		Debug:   debug,
 	}
 
-	providerserver.Serve(context.Background(), lambdalabs.New(version), opts)
+	providerserver.Serve(context.Background(), provider.New(version), opts)
 }

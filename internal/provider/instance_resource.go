@@ -1,4 +1,4 @@
-package lambdalabs
+package provider
 
 import (
 	"context"
