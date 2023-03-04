@@ -51,23 +51,29 @@ func (r *instanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				MarkdownDescription: "The instance ID",
+				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				Optional: true,
+				MarkdownDescription: "The instance name",
+				Optional:            true,
 			},
 			"ip": schema.StringAttribute{
-				Computed: true,
+				MarkdownDescription: "The public IP address",
+				Computed:            true,
 			},
 			"region_name": schema.StringAttribute{
-				Required: true,
+				MarkdownDescription: "The instance region name",
+				Required:            true,
 			},
 			"instance_type_name": schema.StringAttribute{
-				Required: true,
+				MarkdownDescription: "The instance type name",
+				Required:            true,
 			},
 			"ssh_key_names": schema.ListAttribute{
-				Required:    true,
-				ElementType: types.StringType,
+				MarkdownDescription: "The SSH Key names to install into instance",
+				Required:            true,
+				ElementType:         types.StringType,
 			},
 		},
 	}

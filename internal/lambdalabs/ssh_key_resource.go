@@ -39,18 +39,22 @@ func (r *sshKeyResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Computed: true,
+				MarkdownDescription: "SSH Key ID",
+				Computed:            true,
 			},
 			"name": schema.StringAttribute{
-				Required: true,
+				MarkdownDescription: "The SSH Key name",
+				Required:            true,
 			},
 			"public_key": schema.StringAttribute{
-				Optional: true,
-				Computed: true,
+				MarkdownDescription: "The public key to install into instance",
+				Optional:            true,
+				Computed:            true,
 			},
 			"private_key": schema.StringAttribute{
-				Computed:  true,
-				Sensitive: true,
+				MarkdownDescription: "If public key not given the Lambdalabs will generated one and return in this field",
+				Computed:            true,
+				Sensitive:           true,
 			},
 		},
 	}

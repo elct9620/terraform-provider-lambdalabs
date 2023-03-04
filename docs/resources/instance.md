@@ -17,17 +17,17 @@ description: |-
 
 ### Required
 
-- `instance_type_name` (String)
-- `region_name` (String)
-- `ssh_key_names` (List of String)
+- `instance_type_name` (String) The instance type name
+- `region_name` (String) The instance region name
+- `ssh_key_names` (List of String) The SSH Key names to install into instance
 
 ### Optional
 
-- `name` (String)
+- `name` (String) The instance name
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `ip` (String)
+- `id` (String) The instance ID
+- `ip` (String) The public IP address
 
 

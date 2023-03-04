@@ -17,15 +17,15 @@ description: |-
 
 ### Required
 
-- `name` (String)
+- `name` (String) The SSH Key name
 
 ### Optional
 
-- `public_key` (String)
+- `public_key` (String) The public key to install into instance
 
 ### Read-Only
 
-- `id` (String) The ID of this resource.
-- `private_key` (String, Sensitive)
+- `id` (String) SSH Key ID
+- `private_key` (String, Sensitive) If public key not given the Lambdalabs will generated one and return in this field
 
 

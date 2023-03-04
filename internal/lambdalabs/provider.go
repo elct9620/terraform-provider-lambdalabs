@@ -40,8 +40,9 @@ func (p *lambdalabsProvider) Schema(_ context.Context, _ provider.SchemaRequest,
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
-				Optional:  true,
-				Sensitive: true,
+				MarkdownDescription: "The API Key from Lambdalabs",
+				Optional:            true,
+				Sensitive:           true,
 			},
 		},
 	}

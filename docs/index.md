@@ -17,4 +17,4 @@ description: |-
 
 ### Optional
 
-- `api_key` (String, Sensitive)
+- `api_key` (String, Sensitive) The API Key from Lambdalabs
