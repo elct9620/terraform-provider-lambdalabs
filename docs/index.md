@@ -18,3 +18,4 @@ description: |-
 ### Optional
 
 - `api_key` (String, Sensitive) The API Key from Lambdalabs
+- `endpoint` (String) The Lambdalabs API Endpoint
