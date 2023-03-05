@@ -14,6 +14,7 @@ type Instance struct {
 }
 
 type LaunchInstancePayload struct {
+	Name             *string  `json:"name"`
 	RegionName       string   `json:"region_name"`
 	InstanceTypeName string   `json:"instance_type_name"`
 	SSHKeyNames      []string `json:"ssh_key_names"`
@@ -22,6 +23,8 @@ type LaunchInstancePayload struct {
 type TerminateInstancePayload struct {
 	IDs []string `json:"instance_ids"`
 }
+
+type InstanceOption = func(payload *LaunchInstancePayload)
 
 func (c *Client) GetInstance(id string) (*Instance, error) {
 	resp, err := c.Get("/instances/"+id, nil)
@@ -45,8 +48,14 @@ func (c *Client) GetInstance(id string) (*Instance, error) {
 	return data.Data, nil
 }
 
-func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames []string) (*Instance, error) {
-	body, err := json.Marshal(LaunchInstancePayload{RegionName: regionName, InstanceTypeName: instanceTypeName, SSHKeyNames: sshKeyNames})
+func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames []string, options ...InstanceOption) (*Instance, error) {
+	payload := LaunchInstancePayload{RegionName: regionName, InstanceTypeName: instanceTypeName, SSHKeyNames: sshKeyNames}
+
+	for _, option := range options {
+		option(&payload)
+	}
+
+	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +86,12 @@ func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames
 	}
 
 	return instance, nil
+}
+
+func WithInstanceName(name string) InstanceOption {
+	return func(payload *LaunchInstancePayload) {
+		payload.Name = &name
+	}
 }
 
 func (c *Client) TerminateInstance(id string) (*Instance, error) {

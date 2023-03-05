@@ -105,10 +105,16 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	options := []api.InstanceOption{}
+	if !instance.Name.IsNull() {
+		options = append(options, api.WithInstanceName(instance.Name.ValueString()))
+	}
+
 	createdInstance, err := r.client.LaunchInstance(
 		instance.RegionName.ValueString(),
 		instance.InstanceTypeName.ValueString(),
 		keyNames,
+		options...,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError(
