@@ -55,7 +55,7 @@ func Test_SSHKeyResource(t *testing.T) {
 			`, input.Name)
 			w.Write([]byte(resBody)) //nolint:errcheck
 		case "DELETE":
-			w.Write([]byte{})
+			w.Write([]byte{}) //nolint:errcheck
 		default:
 			http.NotFoundHandler().ServeHTTP(w, r)
 		}
