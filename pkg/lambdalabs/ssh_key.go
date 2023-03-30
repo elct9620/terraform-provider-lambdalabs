@@ -117,3 +117,12 @@ func (c *Client) CreateSSHKeyWithPublicKey(name, publicKey string) (*SSHKey, err
 
 	return data.Data, nil
 }
+
+func (c *Client) DeleteSSHKey(id string) error {
+	_, err := c.Delete("/ssh-keys/"+id, bytes.NewBuffer([]byte{}))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

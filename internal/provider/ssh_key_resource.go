@@ -149,8 +149,19 @@ func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	resp.Diagnostics.AddWarning(
-		"Error Delete Lambdalabs SSH Key",
-		"Unsupported Method",
-	)
+	var state sshKeyModel
+	diags := req.State.Get(ctx, &state)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	err := r.client.DeleteSSHKey(state.ID.ValueString())
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error Delete Lambdalabs SSH Key",
+			"Could not delete Lambdalabs SSH Key ID "+state.ID.ValueString()+": "+err.Error(),
+		)
+		return
+	}
 }

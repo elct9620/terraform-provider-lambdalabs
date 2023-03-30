@@ -89,5 +89,29 @@ func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
 
+func (c *Client) Delete(path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest("DELETE", c.endpoint+path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+c.apiKey)
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	switch resp.StatusCode {
+	case http.StatusUnauthorized:
+		return nil, ErrUnauthorized
+	case http.StatusForbidden:
+		return nil, ErrForbidden
+	case http.StatusBadRequest:
+		return nil, ErrBadRequest
+	}
+
+	return resp, nil
 }
