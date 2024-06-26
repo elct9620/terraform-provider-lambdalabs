@@ -19,10 +19,10 @@ const (
 )
 
 var (
-	_                     resource.Resource              = &instanceResource{}
-	_                     resource.ResourceWithConfigure = &instanceResource{}
-	instanceCreateTimeout                                = 10 * time.Minute
-	instanceCreateDelay                                  = 10 * time.Second
+	_                            resource.Resource              = &instanceResource{}
+	_                            resource.ResourceWithConfigure = &instanceResource{}
+	defaultInstanceCreateTimeout                                = 10 * time.Minute
+	instanceCreateDelay                                         = 10 * time.Second
 )
 
 type instanceResource struct {
@@ -112,6 +112,12 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	createTimeout, diags := instance.Timeouts.Create(ctx, defaultInstanceCreateTimeout)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	options := []api.InstanceOption{}
 	if !instance.Name.IsNull() {
 		options = append(options, api.WithInstanceName(instance.Name.ValueString()))
@@ -131,7 +137,7 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	latestInstance, err := r.waitInstanceCreated(ctx, createdInstance.ID)
+	latestInstance, err := r.waitInstanceCreated(ctx, createdInstance.ID, createTimeout)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating instance",
@@ -208,7 +214,7 @@ func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 }
 
-func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string) (*api.Instance, error) {
+func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, createTimeout time.Duration) (*api.Instance, error) {
 	changeConfig := &helper.StateChangeConf{
 		Pending: []string{
 			InstanceStateBooting,
@@ -224,7 +230,7 @@ func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string) (
 			}
 			return resp, resp.Status, nil
 		},
-		Timeout: instanceCreateTimeout,
+		Timeout: createTimeout,
 		Delay:   instanceCreateDelay,
 	}
 	raw, err := changeConfig.WaitForStateContext(ctx)
