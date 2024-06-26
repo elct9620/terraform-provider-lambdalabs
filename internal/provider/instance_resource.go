@@ -5,6 +5,7 @@ import (
 	"time"
 
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
+	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -29,12 +30,13 @@ type instanceResource struct {
 }
 
 type instanceModel struct {
-	ID               types.String `tfsdk:"id"`
-	Name             types.String `tfsdk:"name"`
-	IP               types.String `tfsdk:"ip"`
-	RegionName       types.String `tfsdk:"region_name"`
-	InstanceTypeName types.String `tfsdk:"instance_type_name"`
-	SSHKeyNames      types.List   `tfsdk:"ssh_key_names"`
+	ID               types.String   `tfsdk:"id"`
+	Name             types.String   `tfsdk:"name"`
+	IP               types.String   `tfsdk:"ip"`
+	RegionName       types.String   `tfsdk:"region_name"`
+	InstanceTypeName types.String   `tfsdk:"instance_type_name"`
+	SSHKeyNames      types.List     `tfsdk:"ssh_key_names"`
+	Timeouts         timeouts.Value `tfsdk:"timeouts"`
 }
 
 func NewInstanceResource() resource.Resource {
@@ -47,7 +49,7 @@ func (r *instanceResource) Metadata(_ context.Context, req resource.MetadataRequ
 }
 
 // Schema defines the schema for the resource.
-func (r *instanceResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *instanceResource) Schema(ctx context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Manage instances",
 		Attributes: map[string]schema.Attribute{
@@ -76,6 +78,11 @@ func (r *instanceResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 				Required:            true,
 				ElementType:         types.StringType,
 			},
+		},
+		Blocks: map[string]schema.Block{
+			"timeouts": timeouts.Block(ctx, timeouts.Opts{
+				Create: true,
+			}),
 		},
 	}
 }

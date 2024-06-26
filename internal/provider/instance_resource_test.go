@@ -88,6 +88,9 @@ func Test_InstanceResource(t *testing.T) {
 					ssh_key_names = [
 						"terraform"
 					]
+					timeouts {
+						create = "10s"
+					}
 				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -96,6 +99,7 @@ func Test_InstanceResource(t *testing.T) {
 					resource.TestCheckResourceAttr("lambdalabs_instance.default", "region_name", "us-tx-1"),
 					resource.TestCheckResourceAttr("lambdalabs_instance.default", "instance_type_name", "gpu_1x_a100"),
 					resource.TestCheckResourceAttr("lambdalabs_instance.default", "ssh_key_names.0", "terraform"),
+					resource.TestCheckResourceAttr("lambdalabs_instance.default", "timeouts.create", "10s"),
 				),
 			},
 		},
