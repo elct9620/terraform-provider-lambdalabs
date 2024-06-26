@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	helper "github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 )
 
 const (
