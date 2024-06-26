@@ -48,5 +48,3 @@ output "key" {
 
 - `id` (String) SSH Key ID
 - `private_key` (String, Sensitive) If public key not given the Lambdalabs will generated one and return in this field
-
-

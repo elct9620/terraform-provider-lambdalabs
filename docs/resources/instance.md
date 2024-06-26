@@ -53,5 +53,3 @@ resource "lambdalabs_instance" "stable_diffusion" {
 
 - `id` (String) The instance ID
 - `ip` (String) The public IP address
-
-
