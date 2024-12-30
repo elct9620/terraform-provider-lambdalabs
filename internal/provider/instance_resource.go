@@ -137,9 +137,6 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 	if !instance.Name.IsNull() {
 		options = append(options, api.WithInstanceName(instance.Name.ValueString()))
 	}
-	if len(fileSystemNames) > 0 {
-		options = append(options, api.WithFileSystemNames(fileSystemNames))
-	}
 
 	createdInstance, err := r.client.LaunchInstance(
 		instance.RegionName.ValueString(),
@@ -166,7 +163,6 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 
 	instance.ID = types.StringValue(latestInstance.ID)
 	instance.IP = types.StringValue(latestInstance.IP)
-	instance.FileSystemNames = types.ListValueFrom(ctx, types.StringType, fileSystemNames)
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, instance)
@@ -195,7 +191,6 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	state.IP = types.StringValue(latestInstance.IP)
-	state.FileSystemNames = types.ListValueFrom(ctx, types.StringType, latestInstance.FileSystemNames)
 
 	// Set refreshed state
 	diags = resp.State.Set(ctx, &state)
