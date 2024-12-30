@@ -231,3 +231,31 @@ func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteReques
 		return
 	}
 }
+
+func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, createTimeout time.Duration) (*api.Instance, error) {
+	changeConfig := &helper.StateChangeConf{
+		Pending: []string{
+			InstanceStateBooting,
+		},
+		Target: []string{
+			InstanceStateActive,
+			InstanceStateContactable,
+		},
+		Refresh: func() (any, string, error) {
+			resp, err := r.client.GetInstance(id)
+			if err != nil {
+				return nil, "", err
+			}
+			return resp, resp.Status, nil
+		},
+		Timeout: createTimeout,
+		Delay:   instanceCreateDelay,
+	}
+	raw, err := changeConfig.WaitForStateContext(ctx)
+
+	if v, ok := raw.(*api.Instance); ok {
+		return v, err
+	}
+
+	return nil, err
+}
