@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"fmt"
 )
 
 type Instance struct {
@@ -11,6 +12,7 @@ type Instance struct {
 	Name   string `json:"name"`
 	IP     string `json:"ip"`
 	Status string `json:"status"`
+	FileSystemNames []string `json:"file_system_names,omitempty"`
 }
 
 type LaunchInstancePayload struct {
@@ -18,6 +20,7 @@ type LaunchInstancePayload struct {
 	RegionName       string   `json:"region_name"`
 	InstanceTypeName string   `json:"instance_type_name"`
 	SSHKeyNames      []string `json:"ssh_key_names"`
+	FileSystemNames  []string `json:"file_system_names,omitempty"`
 }
 
 type TerminateInstancePayload struct {
@@ -48,8 +51,13 @@ func (c *Client) GetInstance(id string) (*Instance, error) {
 	return data.Data, nil
 }
 
+// LaunchInstance creates a new instance with the specified configuration
 func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames []string, options ...InstanceOption) (*Instance, error) {
-	payload := LaunchInstancePayload{RegionName: regionName, InstanceTypeName: instanceTypeName, SSHKeyNames: sshKeyNames}
+	payload := LaunchInstancePayload{
+		RegionName:       regionName,
+		InstanceTypeName: instanceTypeName,
+		SSHKeyNames:      sshKeyNames,
+	}
 
 	for _, option := range options {
 		option(&payload)
@@ -88,12 +96,21 @@ func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames
 	return instance, nil
 }
 
+// WithInstanceName sets the instance name in the payload
 func WithInstanceName(name string) InstanceOption {
 	return func(payload *LaunchInstancePayload) {
 		payload.Name = &name
 	}
 }
 
+// WithFileSystemNames sets the file system names in the payload
+func WithFileSystemNames(names []string) InstanceOption {
+	return func(payload *LaunchInstancePayload) {
+		payload.FileSystemNames = names
+	}
+}
+
+// TerminateInstance terminates an existing instance by ID
 func (c *Client) TerminateInstance(id string) (*Instance, error) {
 	body, err := json.Marshal(TerminateInstancePayload{IDs: []string{id}})
 	if err != nil {
@@ -118,6 +135,10 @@ func (c *Client) TerminateInstance(id string) (*Instance, error) {
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
+	}
+
+	if len(data.Data.Instances) == 0 {
+		return nil, nil
 	}
 
 	return data.Data.Instances[0], nil
