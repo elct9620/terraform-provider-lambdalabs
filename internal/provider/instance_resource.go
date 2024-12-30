@@ -36,6 +36,7 @@ type instanceModel struct {
 	RegionName       types.String   `tfsdk:"region_name"`
 	InstanceTypeName types.String   `tfsdk:"instance_type_name"`
 	SSHKeyNames      types.List     `tfsdk:"ssh_key_names"`
+	FileSystemNames  types.List     `tfsdk:"file_system_names"`
 	Timeouts         timeouts.Value `tfsdk:"timeouts"`
 }
 
@@ -78,6 +79,11 @@ func (r *instanceResource) Schema(ctx context.Context, _ resource.SchemaRequest,
 				Required:            true,
 				ElementType:         types.StringType,
 			},
+			"file_system_names": schema.ListAttribute{
+				MarkdownDescription: "Optional list of file system names to attach to the instance",
+				Optional:            true,
+				ElementType:         types.StringType,
+			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -112,6 +118,15 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	fileSystemNames := []string{}
+	if !instance.FileSystemNames.IsNull() {
+		diags = instance.FileSystemNames.ElementsAs(ctx, &fileSystemNames, false)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+
 	createTimeout, diags := instance.Timeouts.Create(ctx, defaultInstanceCreateTimeout)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -121,6 +136,9 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 	options := []api.InstanceOption{}
 	if !instance.Name.IsNull() {
 		options = append(options, api.WithInstanceName(instance.Name.ValueString()))
+	}
+	if len(fileSystemNames) > 0 {
+		options = append(options, api.WithFileSystemNames(fileSystemNames))
 	}
 
 	createdInstance, err := r.client.LaunchInstance(
@@ -148,6 +166,7 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 
 	instance.ID = types.StringValue(latestInstance.ID)
 	instance.IP = types.StringValue(latestInstance.IP)
+	instance.FileSystemNames = types.ListValueFrom(ctx, types.StringType, fileSystemNames)
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, instance)
@@ -176,8 +195,7 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	state.IP = types.StringValue(latestInstance.IP)
-
-	// Set refreshed state
+	state.FileSystemNames = types.ListValueFrom(ctx, types.StringType, latestInstance.FileSystemNames)
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -212,32 +230,4 @@ func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteReques
 		)
 		return
 	}
-}
-
-func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, createTimeout time.Duration) (*api.Instance, error) {
-	changeConfig := &helper.StateChangeConf{
-		Pending: []string{
-			InstanceStateBooting,
-		},
-		Target: []string{
-			InstanceStateActive,
-			InstanceStateContactable,
-		},
-		Refresh: func() (any, string, error) {
-			resp, err := r.client.GetInstance(id)
-			if err != nil {
-				return nil, "", err
-			}
-			return resp, resp.Status, nil
-		},
-		Timeout: createTimeout,
-		Delay:   instanceCreateDelay,
-	}
-	raw, err := changeConfig.WaitForStateContext(ctx)
-
-	if v, ok := raw.(*api.Instance); ok {
-		return v, err
-	}
-
-	return nil, err
 }
