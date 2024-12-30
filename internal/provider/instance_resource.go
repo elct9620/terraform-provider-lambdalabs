@@ -36,6 +36,7 @@ type instanceModel struct {
 	RegionName       types.String   `tfsdk:"region_name"`
 	InstanceTypeName types.String   `tfsdk:"instance_type_name"`
 	SSHKeyNames      types.List     `tfsdk:"ssh_key_names"`
+	FileSystemNames  types.List     `tfsdk:"file_system_names"`
 	Timeouts         timeouts.Value `tfsdk:"timeouts"`
 }
 
@@ -78,6 +79,11 @@ func (r *instanceResource) Schema(ctx context.Context, _ resource.SchemaRequest,
 				Required:            true,
 				ElementType:         types.StringType,
 			},
+			"file_system_names": schema.ListAttribute{
+				MarkdownDescription: "Optional list of file system names to attach to the instance",
+				Optional:            true,
+				ElementType:         types.StringType,
+			},
 		},
 		Blocks: map[string]schema.Block{
 			"timeouts": timeouts.Block(ctx, timeouts.Opts{
@@ -110,6 +116,15 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+	fileSystemNames := []string{}
+	if !instance.FileSystemNames.IsNull() {
+		diags = instance.FileSystemNames.ElementsAs(ctx, &fileSystemNames, false)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 	}
 
 	createTimeout, diags := instance.Timeouts.Create(ctx, defaultInstanceCreateTimeout)
