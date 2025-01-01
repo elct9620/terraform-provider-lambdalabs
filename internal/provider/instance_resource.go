@@ -196,6 +196,10 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 
 	state.IP = types.StringValue(latestInstance.IP)
 	state.FileSystemNames, diags = types.ListValueFrom(ctx, types.StringType, latestInstance.FileSystemNames)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Set refreshed state
 	diags = resp.State.Set(ctx, &state)
