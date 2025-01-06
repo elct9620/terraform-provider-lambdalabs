@@ -47,6 +47,7 @@ resource "lambdalabs_instance" "stable_diffusion" {
 
 ### Optional
 
+- `file_system_names` (List of String) Optional list of file system names to attach to the instance
 - `name` (String) The instance name
 - `timeouts` (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
 
