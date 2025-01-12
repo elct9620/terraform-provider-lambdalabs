@@ -42,6 +42,7 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
+      - uses: hashicorp/setup-terraform@v3
       - run: go generate ./...
       - name: git diff
         run: |
@@ -63,6 +64,8 @@ jobs:
           - '1.6.*'
           - '1.7.*'
           - '1.8.*'
+          - '1.10.*'
+          - '1.11.*'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
