@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 
+	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -25,7 +26,7 @@ type sshKeyModel struct {
 	PrivateKey types.String `tfsdk:"private_key"`
 }
 
-func NewSSHKeyResource() resource.Resource {
+func NewSshKeyResource() resource.Resource {
 	return &sshKeyResource{}
 }
 
@@ -79,14 +80,15 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	var createdKey *api.SSHKey
-	var err error
-	if key.PublicKey.ValueString() == "" {
-		createdKey, err = r.client.CreateSSHKey(ctx, key.Name.ValueString())
-	} else {
-		createdKey, err = r.client.CreateSSHKeyWithPublicKey(ctx, key.Name.ValueString(), key.PublicKey.ValueString())
+	payload := lambdalabs.CreateSshKeyRequest{
+		Name: key.Name.ValueString(),
+	}
+	if !key.PublicKey.IsNull() {
+		pubKey := key.PublicKey.ValueString()
+		payload.PublicKey = &pubKey
 	}
 
+	res, err := r.client.CreateSshKey(ctx, &payload)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating SSH Key",
@@ -95,10 +97,10 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	key.ID = types.StringValue(createdKey.ID)
-	key.Name = types.StringValue(createdKey.Name)
-	key.PublicKey = types.StringValue(createdKey.PublicKey)
-	key.PrivateKey = types.StringValue(createdKey.PrivateKey)
+	key.ID = types.StringValue(res.Data.Id)
+	key.Name = types.StringValue(res.Data.Name)
+	key.PublicKey = types.StringValue(res.Data.PublicKey)
+	key.PrivateKey = types.StringValue(res.Data.PublicKey)
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, key)
@@ -117,16 +119,33 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	key, err := r.client.GetSSHKey(ctx, state.ID.ValueString())
+	keys, err := r.client.ListSshKeys(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Lambdalabs SSH Key",
-			"Could not find Lambdalabs SSH Key ID "+state.ID.ValueString()+": "+err.Error(),
+			"Could not list Lambdalabs SSH Keys: "+err.Error(),
 		)
 		return
 	}
 
-	state.ID = types.StringValue(key.ID)
+	var key *lambdalabs.SshKey
+	keyId := state.ID.ValueString()
+	for _, k := range keys.Data {
+		if k.Id == keyId {
+			key = &k
+			break
+		}
+	}
+
+	if key == nil {
+		resp.Diagnostics.AddError(
+			"Error Reading Lambdalabs SSH Key",
+			"Could not find Lambdalabs SSH Key ID "+keyId,
+		)
+		return
+	}
+
+	state.ID = types.StringValue(key.Id)
 	state.Name = types.StringValue(key.Name)
 	state.PublicKey = types.StringValue(key.PublicKey)
 	state.PrivateKey = types.StringValue(key.PrivateKey)
@@ -156,7 +175,9 @@ func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
-	err := r.client.DeleteSSHKey(state.ID.ValueString())
+	err := r.client.DeleteSshKey(ctx, &lambdalabs.DeleteSshKeyRequest{
+		Id: state.ID.ValueString(),
+	})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Delete Lambdalabs SSH Key",

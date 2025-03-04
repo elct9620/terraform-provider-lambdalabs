@@ -4,69 +4,44 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
-	"io"
 )
 
-var (
-	ErrSSHKeyNotFound = errors.New("SSH Key not exists")
-)
-
-type SSHKey struct {
-	ID         string `json:"id"`
+type SshKey struct {
+	Id         string `json:"id"`
 	Name       string `json:"name"`
 	PublicKey  string `json:"public_key"`
 	PrivateKey string `json:"private_key"`
 }
 
-type CreateSSHKeyPayload struct {
-	Name string `json:"name"`
+type ListSshKeysResponse struct {
+	Data []SshKey `json:"data"`
 }
 
-type CreateSSHKeyWithPKeyPayload struct {
-	Name      string `json:"name"`
-	PublicKey string `json:"public_key"`
-}
-
-func (c *Client) ListSSHKeys(ctx context.Context) ([]*SSHKey, error) {
+func (c *Client) ListSshKeys(ctx context.Context) (*ListSshKeysResponse, error) {
 	resp, err := c.Get(ctx, "/ssh-keys", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
+	var res ListSshKeysResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 
-	var data struct {
-		Data []*SSHKey `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data.Data, nil
+	return &res, nil
 }
 
-func (c *Client) GetSSHKey(ctx context.Context, id string) (*SSHKey, error) {
-	keys, err := c.ListSSHKeys(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	for idx := range keys {
-		if keys[idx].ID == id {
-			return keys[idx], nil
-		}
-	}
-
-	return nil, ErrSSHKeyNotFound
+type CreateSshKeyRequest struct {
+	Name      string  `json:"name"`
+	PublicKey *string `json:"public_key,omitempty"`
 }
 
-func (c *Client) CreateSSHKey(ctx context.Context, name string) (*SSHKey, error) {
-	body, err := json.Marshal(CreateSSHKeyPayload{Name: name})
+type CreateSshKeyResponse struct {
+	Data SshKey `json:"data"`
+}
+
+func (c *Client) CreateSshKey(ctx context.Context, req *CreateSshKeyRequest) (*CreateSshKeyResponse, error) {
+	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
@@ -76,51 +51,20 @@ func (c *Client) CreateSSHKey(ctx context.Context, name string) (*SSHKey, error)
 		return nil, err
 	}
 
-	body, err = io.ReadAll(resp.Body)
-	if err != nil {
+	var res CreateSshKeyResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 
-	var data struct {
-		Data *SSHKey `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data.Data, nil
+	return &res, nil
 }
 
-func (c *Client) CreateSSHKeyWithPublicKey(ctx context.Context, name, publicKey string) (*SSHKey, error) {
-	body, err := json.Marshal(CreateSSHKeyWithPKeyPayload{Name: name, PublicKey: publicKey})
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.Post(ctx, "/ssh-keys", bytes.NewBuffer(body))
-	if err != nil {
-		return nil, err
-	}
-
-	body, err = io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	var data struct {
-		Data *SSHKey `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	return data.Data, nil
+type DeleteSshKeyRequest struct {
+	Id string `json:"id"`
 }
 
-func (c *Client) DeleteSSHKey(id string) error {
-	_, err := c.Delete("/ssh-keys/"+id, bytes.NewBuffer([]byte{}))
+func (c *Client) DeleteSshKey(ctx context.Context, req *DeleteSshKeyRequest) error {
+	_, err := c.Delete(ctx, "/ssh-keys/"+req.Id, nil)
 	if err != nil {
 		return err
 	}

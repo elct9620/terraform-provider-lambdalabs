@@ -91,8 +91,8 @@ func (c *Client) Post(ctx context.Context, path string, body io.Reader) (*http.R
 	return resp, nil
 }
 
-func (c *Client) Delete(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("DELETE", c.baseUrl+path, body)
+func (c *Client) Delete(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}
