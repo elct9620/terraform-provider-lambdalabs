@@ -1,17 +1,19 @@
-package lambdalabs
+package lambdalabs_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 )
 
 func TestTransportAddsAuthorizationHeader(t *testing.T) {
 	const expectedToken = "test-api-key"
-	expectedAuthHeader := AuthorizationType + " " + expectedToken
+	expectedAuthHeader := lambdalabs.AuthorizationType + " " + expectedToken
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		authHeader := r.Header.Get(AuthorizationHeader)
+		authHeader := r.Header.Get(lambdalabs.AuthorizationHeader)
 		if authHeader != expectedAuthHeader {
 			t.Errorf("Expected Authorization header %q, got %q", expectedAuthHeader, authHeader)
 		}
@@ -19,7 +21,7 @@ func TestTransportAddsAuthorizationHeader(t *testing.T) {
 	}))
 	defer server.Close()
 
-	client := New(expectedToken, WithBaseUrl(server.URL))
+	client := lambdalabs.New(expectedToken, lambdalabs.WithBaseUrl(server.URL))
 	
 	_, err := client.Get("/test", nil)
 	if err != nil {
