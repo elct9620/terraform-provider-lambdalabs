@@ -65,13 +65,13 @@ func (c *Client) GetSSHKey(ctx context.Context, id string) (*SSHKey, error) {
 	return nil, ErrSSHKeyNotFound
 }
 
-func (c *Client) CreateSSHKey(name string) (*SSHKey, error) {
+func (c *Client) CreateSSHKey(ctx context.Context, name string) (*SSHKey, error) {
 	body, err := json.Marshal(CreateSSHKeyPayload{Name: name})
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.Post("/ssh-keys", bytes.NewBuffer(body))
+	resp, err := c.Post(ctx, "/ssh-keys", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -92,13 +92,13 @@ func (c *Client) CreateSSHKey(name string) (*SSHKey, error) {
 	return data.Data, nil
 }
 
-func (c *Client) CreateSSHKeyWithPublicKey(name, publicKey string) (*SSHKey, error) {
+func (c *Client) CreateSSHKeyWithPublicKey(ctx context.Context, name, publicKey string) (*SSHKey, error) {
 	body, err := json.Marshal(CreateSSHKeyWithPKeyPayload{Name: name, PublicKey: publicKey})
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.Post("/ssh-keys", bytes.NewBuffer(body))
+	resp, err := c.Post(ctx, "/ssh-keys", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}

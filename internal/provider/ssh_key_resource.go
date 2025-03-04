@@ -82,9 +82,9 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 	var createdKey *api.SSHKey
 	var err error
 	if key.PublicKey.ValueString() == "" {
-		createdKey, err = r.client.CreateSSHKey(key.Name.ValueString())
+		createdKey, err = r.client.CreateSSHKey(ctx, key.Name.ValueString())
 	} else {
-		createdKey, err = r.client.CreateSSHKeyWithPublicKey(key.Name.ValueString(), key.PublicKey.ValueString())
+		createdKey, err = r.client.CreateSSHKeyWithPublicKey(ctx, key.Name.ValueString(), key.PublicKey.ValueString())
 	}
 
 	if err != nil {

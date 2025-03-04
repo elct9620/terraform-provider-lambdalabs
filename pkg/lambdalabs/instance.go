@@ -7,20 +7,6 @@ import (
 	"io"
 )
 
-type LaunchInstancePayload struct {
-	Name             *string  `json:"name"`
-	RegionName       string   `json:"region_name"`
-	InstanceTypeName string   `json:"instance_type_name"`
-	SSHKeyNames      []string `json:"ssh_key_names"`
-	FileSystemNames  []string `json:"file_system_names,omitempty"`
-}
-
-type TerminateInstancePayload struct {
-	IDs []string `json:"instance_ids"`
-}
-
-type InstanceOption = func(payload *LaunchInstancePayload)
-
 type RetrieveInstanceRequest struct {
 	Id string `json:"id"`
 }
@@ -49,95 +35,66 @@ func (c *Client) RetrieveInstance(ctx context.Context, req *RetrieveInstanceRequ
 	return &res, nil
 }
 
+type LaunchInstanceRequest struct {
+	Name             *string  `json:"name,omitempty"`
+	RegionName       string   `json:"region_name"`
+	InstanceTypeName string   `json:"instance_type_name"`
+	SSHKeyNames      []string `json:"ssh_key_names"`
+	FileSystemNames  []string `json:"file_system_names,omitempty"`
+}
+
+type LaunchInstanceResponse struct {
+	Data struct {
+		IDs []string `json:"instance_ids"`
+	} `json:"data"`
+}
+
 // LaunchInstance creates a new instance with the specified configuration
-func (c *Client) LaunchInstance(ctx context.Context, regionName, instanceTypeName string, sshKeyNames []string, options ...InstanceOption) (*Instance, error) {
-	payload := LaunchInstancePayload{
-		RegionName:       regionName,
-		InstanceTypeName: instanceTypeName,
-		SSHKeyNames:      sshKeyNames,
-	}
-
-	for _, option := range options {
-		option(&payload)
-	}
-
-	body, err := json.Marshal(payload)
+func (c *Client) LaunchInstance(ctx context.Context, req *LaunchInstanceRequest) (*LaunchInstanceResponse, error) {
+	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.Post("/instance-operations/launch", bytes.NewBuffer(body))
+	resp, err := c.Post(ctx, "/instance-operations/launch", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
-	body, err = io.ReadAll(resp.Body)
-	if err != nil {
+	var res LaunchInstanceResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 
-	var data struct {
-		Data struct {
-			IDs []string `json:"instance_ids"`
-		} `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.RetrieveInstance(ctx, &RetrieveInstanceRequest{Id: data.Data.IDs[0]})
-	if err != nil {
-		return nil, err
-	}
-
-	return &res.Data, nil
+	return &res, nil
 }
 
-// WithInstanceName sets the instance name in the payload
-func WithInstanceName(name string) InstanceOption {
-	return func(payload *LaunchInstancePayload) {
-		payload.Name = &name
-	}
+type TerminateInstanceRequest struct {
+	Ids []string `json:"instance_ids"`
 }
 
-// WithFileSystemNames sets the file system names in the payload
-func WithFileSystemNames(names []string) InstanceOption {
-	return func(payload *LaunchInstancePayload) {
-		payload.FileSystemNames = names
-	}
+type TerminateInstanceResponse struct {
+	Data struct {
+		TerminatedInstances []*Instance `json:"terminated_instances"`
+	} `json:"data"`
 }
 
 // TerminateInstance terminates an existing instance by ID
-func (c *Client) TerminateInstance(id string) (*Instance, error) {
-	body, err := json.Marshal(TerminateInstancePayload{IDs: []string{id}})
+func (c *Client) TerminateInstance(ctx context.Context, req *TerminateInstanceRequest) (*TerminateInstanceResponse, error) {
+	body, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := c.Post("/instance-operations/terminate", bytes.NewBuffer(body))
+	resp, err := c.Post(ctx, "/instance-operations/terminate", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
 
-	body, err = io.ReadAll(resp.Body)
-	if err != nil {
+	var res TerminateInstanceResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 
-	var data struct {
-		Data struct {
-			Instances []*Instance `json:"terminated_instances"`
-		} `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(data.Data.Instances) == 0 {
-		return nil, nil
-	}
-
-	return data.Data.Instances[0], nil
+	return &res, nil
 }

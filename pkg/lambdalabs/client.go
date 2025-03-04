@@ -66,8 +66,8 @@ func (c *Client) Get(ctx context.Context, path string, body io.Reader) (*http.Re
 	return resp, nil
 }
 
-func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("POST", c.baseUrl+path, body)
+func (c *Client) Post(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}

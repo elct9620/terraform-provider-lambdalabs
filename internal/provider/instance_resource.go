@@ -112,16 +112,18 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	keyNames := []string{}
-	diags = instance.SSHKeyNames.ElementsAs(ctx, &keyNames, false)
+	var apiReq = &lambdalabs.LaunchInstanceRequest{
+		SSHKeyNames: []string{},
+	}
+
+	diags = instance.SSHKeyNames.ElementsAs(ctx, &apiReq.SSHKeyNames, false)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	fileSystemNames := []string{}
 	if !instance.FileSystemNames.IsNull() {
-		diags = instance.FileSystemNames.ElementsAs(ctx, &fileSystemNames, false)
+		diags = instance.FileSystemNames.ElementsAs(ctx, &apiReq.FileSystemNames, false)
 		resp.Diagnostics.Append(diags...)
 		if resp.Diagnostics.HasError() {
 			return
@@ -134,21 +136,17 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	options := []api.InstanceOption{}
 	if !instance.Name.IsNull() {
-		options = append(options, api.WithInstanceName(instance.Name.ValueString()))
-	}
-	// Pass to API if non-empty
-	if len(fileSystemNames) > 0 {
-		options = append(options, api.WithFileSystemNames(fileSystemNames))
+		name := instance.Name.ValueString()
+		apiReq.Name = &name
 	}
 
-	createdInstance, err := r.client.LaunchInstance(
+	apiReq.InstanceTypeName = instance.InstanceTypeName.ValueString()
+	apiReq.RegionName = instance.RegionName.ValueString()
+
+	res, err := r.client.LaunchInstance(
 		ctx,
-		instance.RegionName.ValueString(),
-		instance.InstanceTypeName.ValueString(),
-		keyNames,
-		options...,
+		apiReq,
 	)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -158,7 +156,8 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
-	latestInstance, err := r.waitInstanceCreated(ctx, createdInstance.ID, createTimeout)
+	latestInstanceId := res.Data.IDs[0]
+	latestInstance, err := r.waitInstanceCreated(ctx, latestInstanceId, createTimeout)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating instance",
@@ -233,7 +232,9 @@ func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 
 	// Delete existing order
-	_, err := r.client.TerminateInstance(state.ID.ValueString())
+	_, err := r.client.TerminateInstance(ctx, &lambdalabs.TerminateInstanceRequest{
+		Ids: []string{state.ID.ValueString()},
+	})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Deleting instance",
