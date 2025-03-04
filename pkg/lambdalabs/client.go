@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-const Endpoint = "https://cloud.lambdalabs.com/api/v1"
+const BaseUrl = "https://cloud.lambdalabs.com/api/v1"
 
 var (
 	ErrUnauthorized = errors.New("Unauthorized")
@@ -15,18 +15,20 @@ var (
 )
 
 type Client struct {
-	apiKey   string
-	endpoint string
-	http     *http.Client
+	baseUrl string
+	*http.Client
 }
 
 type ClientOption = func(c *Client)
 
 func New(apiKey string, options ...ClientOption) *Client {
 	client := &Client{
-		endpoint: Endpoint,
-		apiKey:   apiKey,
-		http:     &http.Client{},
+		baseUrl: BaseUrl,
+		Client: &http.Client{
+			Transport: &Transport{
+				apiKey: apiKey,
+			},
+		},
 	}
 
 	for _, option := range options {
@@ -36,21 +38,19 @@ func New(apiKey string, options ...ClientOption) *Client {
 	return client
 }
 
-func WithEndpoint(endpoint string) ClientOption {
+func WithBaseUrl(baseUrl string) ClientOption {
 	return func(c *Client) {
-		c.endpoint = endpoint
+		c.baseUrl = baseUrl
 	}
 }
 
 func (c *Client) Get(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("GET", c.endpoint+path, body)
+	req, err := http.NewRequest("GET", c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", "Bearer "+c.apiKey)
-
-	resp, err := c.http.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -66,15 +66,14 @@ func (c *Client) Get(path string, body io.Reader) (*http.Response, error) {
 }
 
 func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("POST", c.endpoint+path, body)
+	req, err := http.NewRequest("POST", c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", "Bearer "+c.apiKey)
 	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := c.http.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -92,14 +91,12 @@ func (c *Client) Post(path string, body io.Reader) (*http.Response, error) {
 }
 
 func (c *Client) Delete(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("DELETE", c.endpoint+path, body)
+	req, err := http.NewRequest("DELETE", c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Add("Authorization", "Bearer "+c.apiKey)
-
-	resp, err := c.http.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

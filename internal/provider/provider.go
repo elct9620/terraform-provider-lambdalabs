@@ -23,6 +23,7 @@ type lambdalabsProvider struct {
 
 type lambdalabsProviderModel struct {
 	Endpoint types.String `tfsdk:"endpoint"`
+	BaseUrl  types.String `tfsdk:"base_url"`
 	ApiKey   types.String `tfsdk:"api_key"`
 }
 
@@ -42,7 +43,12 @@ func (p *lambdalabsProvider) Schema(_ context.Context, _ provider.SchemaRequest,
 		MarkdownDescription: "Manage Lambdalabs Cloud GPU",
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "The Lambdalabs API Endpoint",
+				MarkdownDescription: "The Lambdalabs API Base URL (Legacy)",
+				DeprecationMessage:  "Use `base_url` instead",
+				Optional:            true,
+			},
+			"base_url": schema.StringAttribute{
+				MarkdownDescription: "The Lambdalabs API Base URL",
 				Optional:            true,
 			},
 			"api_key": schema.StringAttribute{
@@ -71,6 +77,15 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 		)
 	}
 
+	if config.BaseUrl.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("base_url"),
+			"Unknown Lambdalabs API Base URL",
+			"The provider cannot create the Lambdalabs API client as there is an unknown configuration value for the Lambdalabs API Base URL. "+
+				"Either target apply the source of the value first, set the value statically in the configuration, or use the LAMBDALABS_BASE_URL environment variable.",
+		)
+	}
+
 	if config.ApiKey.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("api_key"),
@@ -85,18 +100,27 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 	}
 
 	endpoint := os.Getenv("LAMBDALABS_ENDPOINT")
+	baseUrl := os.Getenv("LAMBDALABS_BASE_URL")
 	apiKey := os.Getenv("LAMBDALABS_API_KEY")
 
 	if !config.Endpoint.IsNull() {
-		endpoint = config.Endpoint.ValueString()
+		baseUrl = config.Endpoint.ValueString()
+	}
+
+	if !config.BaseUrl.IsNull() {
+		baseUrl = config.BaseUrl.ValueString()
 	}
 
 	if !config.ApiKey.IsNull() {
 		apiKey = config.ApiKey.ValueString()
 	}
 
-	if endpoint == "" {
-		endpoint = api.Endpoint
+	if baseUrl == "" {
+		baseUrl = endpoint
+	}
+
+	if baseUrl == "" {
+		baseUrl = api.BaseUrl
 	}
 
 	if apiKey == "" {
@@ -113,7 +137,7 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 		return
 	}
 
-	client := api.New(apiKey, api.WithEndpoint(endpoint))
+	client := api.New(apiKey, api.WithBaseUrl(baseUrl))
 
 	resp.DataSourceData = client
 	resp.ResourceData = client

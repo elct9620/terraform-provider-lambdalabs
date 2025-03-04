@@ -12,11 +12,11 @@ var testProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServer, 
 	"lambdalabs": providerserver.NewProtocol6WithError(provider.New("test")()),
 }
 
-func providerConfig(endpoint string) string {
+func providerConfig(baseUrl string) string {
 	return fmt.Sprintf(`
 	provider "lambdalabs" {
-		endpoint = %[1]q
+		base_url = %[1]q
 		api_key  = "test"
 	}
-	`, endpoint)
+	`, baseUrl)
 }
