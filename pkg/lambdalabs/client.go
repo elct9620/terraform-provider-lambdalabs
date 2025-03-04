@@ -2,18 +2,12 @@ package lambdalabs
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"io"
 	"net/http"
 )
 
 const BaseUrl = "https://cloud.lambdalabs.com/api/v1"
-
-var (
-	ErrUnauthorized = errors.New("Unauthorized")
-	ErrForbidden    = errors.New("Forbidden")
-	ErrBadRequest   = errors.New("Bad Request")
-)
 
 type Client struct {
 	baseUrl string
@@ -45,6 +39,23 @@ func WithBaseUrl(baseUrl string) ClientOption {
 	}
 }
 
+type ErrorResponse struct {
+	Error Error `json:"error"`
+}
+
+func assertError(resp *http.Response) (*http.Response, error) {
+	if resp.StatusCode == http.StatusOK {
+		return resp, nil
+	}
+
+	var errorResponse ErrorResponse
+	if err := json.NewDecoder(resp.Body).Decode(&errorResponse); err != nil {
+		return nil, err
+	}
+
+	return nil, &errorResponse.Error
+}
+
 func (c *Client) Get(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl+path, body)
 	if err != nil {
@@ -56,14 +67,7 @@ func (c *Client) Get(ctx context.Context, path string, body io.Reader) (*http.Re
 		return nil, err
 	}
 
-	switch resp.StatusCode {
-	case http.StatusUnauthorized:
-		return nil, ErrUnauthorized
-	case http.StatusForbidden:
-		return nil, ErrForbidden
-	}
-
-	return resp, nil
+	return assertError(resp)
 }
 
 func (c *Client) Post(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
@@ -79,16 +83,7 @@ func (c *Client) Post(ctx context.Context, path string, body io.Reader) (*http.R
 		return nil, err
 	}
 
-	switch resp.StatusCode {
-	case http.StatusUnauthorized:
-		return nil, ErrUnauthorized
-	case http.StatusForbidden:
-		return nil, ErrForbidden
-	case http.StatusBadRequest:
-		return nil, ErrBadRequest
-	}
-
-	return resp, nil
+	return assertError(resp)
 }
 
 func (c *Client) Delete(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
@@ -102,14 +97,5 @@ func (c *Client) Delete(ctx context.Context, path string, body io.Reader) (*http
 		return nil, err
 	}
 
-	switch resp.StatusCode {
-	case http.StatusUnauthorized:
-		return nil, ErrUnauthorized
-	case http.StatusForbidden:
-		return nil, ErrForbidden
-	case http.StatusBadRequest:
-		return nil, ErrBadRequest
-	}
-
-	return resp, nil
+	return assertError(resp)
 }

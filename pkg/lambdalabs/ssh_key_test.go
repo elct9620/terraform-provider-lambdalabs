@@ -236,8 +236,8 @@ func TestDeleteSshKey(t *testing.T) {
 		if err == nil {
 			t.Fatal("Expected error for non-existent SSH key")
 		}
-		if err != lambdalabs.ErrBadRequest {
-			t.Errorf("Expected error %v, got %v", lambdalabs.ErrBadRequest, err)
+		if err.Error() != "SSH key not found" {
+			t.Errorf("Expected error %v, got %v", "SSH key not found", err)
 		}
 	})
 }

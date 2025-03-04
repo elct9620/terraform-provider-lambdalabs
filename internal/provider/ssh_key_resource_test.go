@@ -16,12 +16,13 @@ func Test_SSHKeyResource(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.TrimSpace(r.URL.Path) != "/ssh-keys" {
+		path := strings.TrimSpace(r.URL.Path)
+		if strings.HasPrefix(path, "/api/v1/ssh-keys") {
 			http.NotFoundHandler().ServeHTTP(w, r)
 		}
 
 		switch r.Method {
-		case "GET":
+		case http.MethodGet:
 			resBody := `
 			{
 				"data": [
@@ -35,7 +36,7 @@ func Test_SSHKeyResource(t *testing.T) {
 			}
 			`
 			w.Write([]byte(resBody)) //nolint:errcheck
-		case "POST":
+		case http.MethodPost:
 			var input struct {
 				Name string `json:"name"`
 			}
@@ -54,8 +55,8 @@ func Test_SSHKeyResource(t *testing.T) {
 			}
 			`, input.Name)
 			w.Write([]byte(resBody)) //nolint:errcheck
-		case "DELETE":
-			w.Write([]byte{}) //nolint:errcheck
+		case http.MethodDelete:
+			w.Write(json.RawMessage(`{ "data": {} }`)) //nolint:errcheck
 		default:
 			http.NotFoundHandler().ServeHTTP(w, r)
 		}
