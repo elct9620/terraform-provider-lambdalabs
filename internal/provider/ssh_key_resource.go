@@ -85,7 +85,9 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 	if !key.PublicKey.IsNull() {
 		pubKey := key.PublicKey.ValueString()
-		payload.PublicKey = &pubKey
+		if pubKey != "" {
+			payload.PublicKey = &pubKey
+		}
 	}
 
 	res, err := r.client.CreateSshKey(ctx, &payload)
