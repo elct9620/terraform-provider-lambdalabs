@@ -52,7 +52,7 @@ func TestListSshKeys(t *testing.T) {
 	t.Run("unauthorized", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
 				"error": map[string]string{
 					"code":       "global/invalid-api-key",
 					"message":    "API key was invalid, expired, or deleted.",
@@ -173,7 +173,7 @@ func TestCreateSshKey(t *testing.T) {
 	t.Run("bad request", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
 				"error": map[string]string{
 					"code":       "global/invalid-parameters",
 					"message":    "Invalid request data.",
@@ -202,7 +202,7 @@ func TestDeleteSshKey(t *testing.T) {
 			}
 
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
 				"data": map[string]interface{}{},
 			})
 		}))
@@ -220,7 +220,7 @@ func TestDeleteSshKey(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
 				"error": map[string]string{
 					"code":    "global/not-found",
 					"message": "SSH key not found",
