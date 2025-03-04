@@ -1,6 +1,7 @@
 package lambdalabs
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -44,8 +45,8 @@ func WithBaseUrl(baseUrl string) ClientOption {
 	}
 }
 
-func (c *Client) Get(path string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("GET", c.baseUrl+path, body)
+func (c *Client) Get(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseUrl+path, body)
 	if err != nil {
 		return nil, err
 	}

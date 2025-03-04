@@ -1,6 +1,7 @@
 package lambdalabs_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,8 +23,8 @@ func TestTransportAddsAuthorizationHeader(t *testing.T) {
 	defer server.Close()
 
 	client := lambdalabs.New(expectedToken, lambdalabs.WithBaseUrl(server.URL))
-	
-	_, err := client.Get("/test", nil)
+
+	_, err := client.Get(context.TODO(), "/test", nil)
 	if err != nil {
 		t.Fatalf("Unexpected error: %v", err)
 	}

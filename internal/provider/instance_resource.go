@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -143,6 +144,7 @@ func (r *instanceResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	createdInstance, err := r.client.LaunchInstance(
+		ctx,
 		instance.RegionName.ValueString(),
 		instance.InstanceTypeName.ValueString(),
 		keyNames,
@@ -185,7 +187,9 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	latestInstance, err := r.client.GetInstance(state.ID.ValueString())
+	res, err := r.client.RetrieveInstance(ctx, &lambdalabs.RetrieveInstanceRequest{
+		Id: state.ID.ValueString(),
+	})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Lambdalabs SSH Key",
@@ -193,6 +197,7 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 		)
 		return
 	}
+	latestInstance := res.Data
 
 	state.IP = types.StringValue(latestInstance.IP)
 	state.FileSystemNames, diags = types.ListValueFrom(ctx, types.StringType, latestInstance.FileSystemNames)
@@ -248,11 +253,13 @@ func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, c
 			InstanceStateContactable,
 		},
 		Refresh: func() (any, string, error) {
-			resp, err := r.client.GetInstance(id)
+			resp, err := r.client.RetrieveInstance(ctx, &lambdalabs.RetrieveInstanceRequest{
+				Id: id,
+			})
 			if err != nil {
 				return nil, "", err
 			}
-			return resp, resp.Status, nil
+			return &resp.Data, resp.Data.Status, nil
 		},
 		Timeout: createTimeout,
 		Delay:   instanceCreateDelay,

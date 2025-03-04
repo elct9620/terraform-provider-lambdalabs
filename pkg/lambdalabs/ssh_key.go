@@ -2,6 +2,7 @@ package lambdalabs
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -27,8 +28,8 @@ type CreateSSHKeyWithPKeyPayload struct {
 	PublicKey string `json:"public_key"`
 }
 
-func (c *Client) ListSSHKeys() ([]*SSHKey, error) {
-	resp, err := c.Get("/ssh-keys", nil)
+func (c *Client) ListSSHKeys(ctx context.Context) ([]*SSHKey, error) {
+	resp, err := c.Get(ctx, "/ssh-keys", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +50,8 @@ func (c *Client) ListSSHKeys() ([]*SSHKey, error) {
 	return data.Data, nil
 }
 
-func (c *Client) GetSSHKey(id string) (*SSHKey, error) {
-	keys, err := c.ListSSHKeys()
+func (c *Client) GetSSHKey(ctx context.Context, id string) (*SSHKey, error) {
+	keys, err := c.ListSSHKeys(ctx)
 	if err != nil {
 		return nil, err
 	}

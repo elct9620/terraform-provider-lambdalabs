@@ -2,17 +2,10 @@ package lambdalabs
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 )
-
-type Instance struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	IP     string `json:"ip"`
-	Status string `json:"status"`
-	FileSystemNames []string `json:"file_system_names,omitempty"`
-}
 
 type LaunchInstancePayload struct {
 	Name             *string  `json:"name"`
@@ -28,8 +21,17 @@ type TerminateInstancePayload struct {
 
 type InstanceOption = func(payload *LaunchInstancePayload)
 
-func (c *Client) GetInstance(id string) (*Instance, error) {
-	resp, err := c.Get("/instances/"+id, nil)
+type RetrieveInstanceRequest struct {
+	Id string `json:"id"`
+}
+
+type RetrieveInstanceResponse struct {
+	Data Instance `json:"data"`
+}
+
+// RetrieveInstance to get the instance details
+func (c *Client) RetrieveInstance(ctx context.Context, req *RetrieveInstanceRequest) (*RetrieveInstanceResponse, error) {
+	resp, err := c.Get(ctx, "/instances/"+req.Id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -39,19 +41,16 @@ func (c *Client) GetInstance(id string) (*Instance, error) {
 		return nil, err
 	}
 
-	var data struct {
-		Data *Instance `json:"data"`
-	}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
+	var res RetrieveInstanceResponse
+	if err = json.Unmarshal(body, &res); err != nil {
 		return nil, err
 	}
 
-	return data.Data, nil
+	return &res, nil
 }
 
 // LaunchInstance creates a new instance with the specified configuration
-func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames []string, options ...InstanceOption) (*Instance, error) {
+func (c *Client) LaunchInstance(ctx context.Context, regionName, instanceTypeName string, sshKeyNames []string, options ...InstanceOption) (*Instance, error) {
 	payload := LaunchInstancePayload{
 		RegionName:       regionName,
 		InstanceTypeName: instanceTypeName,
@@ -87,12 +86,12 @@ func (c *Client) LaunchInstance(regionName, instanceTypeName string, sshKeyNames
 		return nil, err
 	}
 
-	instance, err := c.GetInstance(data.Data.IDs[0])
+	res, err := c.RetrieveInstance(ctx, &RetrieveInstanceRequest{Id: data.Data.IDs[0]})
 	if err != nil {
 		return nil, err
 	}
 
-	return instance, nil
+	return &res.Data, nil
 }
 
 // WithInstanceName sets the instance name in the payload

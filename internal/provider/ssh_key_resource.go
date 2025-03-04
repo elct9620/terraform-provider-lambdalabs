@@ -117,7 +117,7 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	key, err := r.client.GetSSHKey(state.ID.ValueString())
+	key, err := r.client.GetSSHKey(ctx, state.ID.ValueString())
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error Reading Lambdalabs SSH Key",
