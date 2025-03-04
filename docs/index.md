@@ -18,4 +18,5 @@ Manage Lambdalabs Cloud GPU
 ### Optional
 
 - `api_key` (String, Sensitive) The API Key from Lambdalabs
-- `endpoint` (String) The Lambdalabs API Endpoint
+- `base_url` (String) The Lambdalabs API Base URL
+- `endpoint` (String, Deprecated) The Lambdalabs API Base URL (Legacy)
