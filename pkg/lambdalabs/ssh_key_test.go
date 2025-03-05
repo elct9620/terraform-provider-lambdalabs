@@ -86,52 +86,6 @@ func TestListSshKeys(t *testing.T) {
 			}
 		})
 	}
-
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.URL.Path != "/ssh-keys" {
-				t.Errorf("Expected path %q, got %q", "/ssh-keys", r.URL.Path)
-			}
-			if r.Method != http.MethodGet {
-				t.Errorf("Expected method %q, got %q", http.MethodGet, r.Method)
-			}
-
-			w.WriteHeader(http.StatusOK)
-			if err := json.NewEncoder(w).Encode(expected); err != nil {
-				t.Fatal(err)
-			}
-		}))
-		defer server.Close()
-
-		client := lambdalabs.New("test-key", lambdalabs.WithBaseUrl(server.URL))
-		result, err := client.ListSshKeys(context.Background())
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if !reflect.DeepEqual(expected, result) {
-			t.Errorf("Expected %+v, got %+v", expected, result)
-		}
-	})
-
-	t.Run("unauthorized", func(t *testing.T) {
-		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
-				"error": map[string]string{
-					"code":       "global/invalid-api-key",
-					"message":    "API key was invalid, expired, or deleted.",
-					"suggestion": "Check your API key or create a new one, then try again.",
-				},
-			})
-		}))
-		defer server.Close()
-
-		client := lambdalabs.New("invalid-key", lambdalabs.WithBaseUrl(server.URL))
-		_, err := client.ListSshKeys(context.Background())
-		if err == nil {
-			t.Error("Expected error, got nil")
-		}
-	})
 }
 
 func TestCreateSshKey(t *testing.T) {
