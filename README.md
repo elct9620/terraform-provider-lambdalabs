@@ -1,6 +1,8 @@
 Terraform Provider - Lambdalabs
 ===
 
+[![codecov](https://codecov.io/gh/elct9620/terraform-provider-lambdalabs/graph/badge.svg?token=Y4DY0J7DFR)](https://codecov.io/gh/elct9620/terraform-provider-lambdalabs)
+
 The Terraform provider for Lambdalabs.
 
 ## Example
