@@ -66,8 +66,8 @@ jobs:
           - '1.8.*'
           - '1.9.*'
           - '1.10.*'
-      env:
-        TERRAFORM: ${{ matrix.terraform }}
+    env:
+      TERRAFORM: ${{ matrix.terraform }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
