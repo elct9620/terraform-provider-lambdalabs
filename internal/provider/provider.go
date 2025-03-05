@@ -144,7 +144,9 @@ func (p *lambdalabsProvider) Configure(ctx context.Context, req provider.Configu
 }
 
 func (p *lambdalabsProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-	return nil
+	return []func() datasource.DataSource{
+		NewSshKeyData,
+	}
 }
 
 func (p *lambdalabsProvider) Resources(_ context.Context) []func() resource.Resource {
