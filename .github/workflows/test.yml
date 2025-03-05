@@ -79,5 +79,9 @@ jobs:
       - run: go mod download
       - env:
           TF_ACC: "1"
-        run: go test -v -cover ./...
+        run: go test -v -cover -coverprofile=coverage.txt ./...
         timeout-minutes: 10
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
