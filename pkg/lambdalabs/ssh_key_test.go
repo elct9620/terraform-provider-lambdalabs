@@ -12,16 +12,80 @@ import (
 )
 
 func TestListSshKeys(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		expected := &lambdalabs.ListSshKeysResponse{
-			Data: []lambdalabs.SshKey{
-				{
-					Id:        "ddf9a910ceb744a0bb95242cbba6cb50",
-					Name:      "my-public-key",
-					PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICN+lJwsONkwrdsSnQsu1ydUkIuIg5oOC+Eslvmtt60T noname",
+	cases := []struct {
+		name     string
+		handler  http.HandlerFunc
+		expected *lambdalabs.ListSshKeysResponse
+		err      error
+	}{
+		{
+			name: "success",
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"data": []map[string]interface{}{
+						{
+							"id":         "ddf9a910ceb744a0bb95242cbba6cb50",
+							"name":       "my-public-key",
+							"public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICN+lJwsONkwrdsSnQsu1ydUkIuIg5oOC+Eslvmtt60T noname",
+						},
+					},
+				})
+			},
+			expected: &lambdalabs.ListSshKeysResponse{
+				Data: []lambdalabs.SshKey{
+					{
+						Id:        "ddf9a910ceb744a0bb95242cbba6cb50",
+						Name:      "my-public-key",
+						PublicKey: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICN+lJwsONkwrdsSnQsu1ydUkIuIg5oOC+Eslvmtt60T noname",
+					},
 				},
 			},
-		}
+			err: nil,
+		},
+		{
+			name: "unauthorized",
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"error": map[string]string{
+						"code":       "global/invalid-api-key",
+						"message":    "API key was invalid, expired, or deleted.",
+						"suggestion": "Check your API key or create a new one, then try again.",
+					},
+				})
+			},
+			expected: nil,
+			err:      &lambdalabs.Error{Message: "API key was invalid, expired, or deleted."},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path != "/ssh-keys" {
+					t.Errorf("Expected path %q, got %q", "/ssh-keys", r.URL.Path)
+				}
+				if r.Method != http.MethodGet {
+					t.Errorf("Expected method %q, got %q", http.MethodGet, r.Method)
+				}
+
+				c.handler(w, r)
+			}))
+			defer server.Close()
+
+			client := lambdalabs.New("test-key", lambdalabs.WithBaseUrl(server.URL))
+			result, err := client.ListSshKeys(context.Background())
+
+			if !reflect.DeepEqual(c.expected, result) {
+				t.Errorf("Expected %+v, got %+v", c.expected, result)
+			}
+
+			if err != nil && c.err != nil && err.Error() != c.err.Error() {
+				t.Errorf("Expected error %v, got %v", c.err, err)
+			}
+		})
+	}
 
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.URL.Path != "/ssh-keys" {
