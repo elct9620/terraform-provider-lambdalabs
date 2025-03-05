@@ -66,6 +66,8 @@ jobs:
           - '1.8.*'
           - '1.9.*'
           - '1.10.*'
+      env:
+        TERRAFORM: ${{ matrix.terraform }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -85,3 +87,4 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          env_vars: TERRAFORM
