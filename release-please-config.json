@@ -1,0 +1,11 @@
+{
+  "release-type": "go",
+  "last-release-sha": "060b1dbd49a97a287c9807bd03b74d88c406ac4e",
+  "packages": {
+    ".":{
+        "component": "terraform-provider-lambdalabs",
+        "include-component-in-tag": false,
+        "release-type": "go"
+      }
+  }
+}
