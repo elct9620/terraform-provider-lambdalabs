@@ -141,7 +141,10 @@ func (d *instanceTypesData) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	hasFilter := model.Filter != nil && !model.Filter.Region.IsNull()
-	regionName := model.Filter.Region.ValueString()
+	var regionName string
+	if hasFilter {
+		regionName = model.Filter.Region.ValueString()
+	}
 
 	model.InstanceTypes = make(map[string]*instanceTypeModel)
 	model.Id = types.StringValue("all")
