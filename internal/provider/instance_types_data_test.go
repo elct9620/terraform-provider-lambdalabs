@@ -49,13 +49,10 @@ func Test_InstanceTypesData(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: providerConfig(server.URL) + `
-				data "lambdalabs_instance_types" "default" {
-					filter = {
-						region = "us-west-1"
-					}
-				}
+				data "lambdalabs_instance_types" "default" {}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "id", "all"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.name", "gpu_1x_a100"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.description", "1x NVIDIA A100 (80 GB)"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.gpu_description", "NVIDIA A100 (80 GB)"),
@@ -64,6 +61,26 @@ func Test_InstanceTypesData(t *testing.T) {
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.specs.memory_gib", "200"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.specs.storage_gib", "1024"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.specs.gpus", "1"),
+				),
+			},
+			{
+				Config: providerConfig(server.URL) + `
+				data "lambdalabs_instance_types" "filtered" {
+					filter = {
+						region = "us-west-1"
+					}
+				}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "id", "us-west-1"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.name", "gpu_1x_a100"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.description", "1x NVIDIA A100 (80 GB)"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.gpu_description", "NVIDIA A100 (80 GB)"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.price_cents_per_hour", "199"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.specs.vcpus", "30"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.specs.memory_gib", "200"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.specs.storage_gib", "1024"),
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.specs.gpus", "1"),
 				),
 			},
 		},
