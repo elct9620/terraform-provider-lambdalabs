@@ -21,14 +21,14 @@ type InstanceTypeSpecs struct {
 }
 
 type InstanceType struct {
-	Name               string            `json:"name"`
-	Description        string            `json:"description"`
-	GPUDescription     string            `json:"gpu_description"`
+	Name              string            `json:"name"`
+	Description       string            `json:"description"`
+	GPUDescription    string            `json:"gpu_description"`
 	PriceCentsPerHour int               `json:"price_cents_per_hour"`
 	Specs             InstanceTypeSpecs `json:"specs"`
 }
 
 type InstanceTypeInfo struct {
 	InstanceType                 InstanceType `json:"instance_type"`
-	RegionsWithCapacityAvailable []Region    `json:"regions_with_capacity_available"`
+	RegionsWithCapacityAvailable []Region     `json:"regions_with_capacity_available"`
 }
