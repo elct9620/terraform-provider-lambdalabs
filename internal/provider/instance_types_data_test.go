@@ -83,6 +83,19 @@ func Test_InstanceTypesData(t *testing.T) {
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.filtered", "instance_types.gpu_1x_a100.specs.gpus", "1"),
 				),
 			},
+			{
+				Config: providerConfig(server.URL) + `
+				data "lambdalabs_instance_types" "not_available" {
+					filter = {
+						region = "us-east-1"
+					}
+				}
+				`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.not_available", "id", "us-east-1"),
+					resource.TestCheckNoResourceAttr("data.lambdalabs_instance_types.not_available", "instance_types.gpu_1x_a100"),
+				),
+			},
 		},
 	})
 }
