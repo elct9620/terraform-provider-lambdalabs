@@ -49,7 +49,11 @@ func Test_InstanceTypesData(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: providerConfig(server.URL) + `
-				data "lambdalabs_instance_types" "default" {}
+				data "lambdalabs_instance_types" "default" {
+					filter {
+						region = "us-west-1"
+					}
+				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "id", "instance_types"),

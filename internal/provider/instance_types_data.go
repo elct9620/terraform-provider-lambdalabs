@@ -33,8 +33,13 @@ type instanceTypeModel struct {
 	Specs             *instanceTypeSpecsModel `tfsdk:"specs"`
 }
 
+type instanceTypesFilterModel struct {
+	Region types.String `tfsdk:"region"`
+}
+
 type instanceTypesDataModel struct {
 	ID            types.String                     `tfsdk:"id"`
+	Filter        *instanceTypesFilterModel        `tfsdk:"filter"`
 	InstanceTypes map[string]*instanceTypeModel    `tfsdk:"instance_types"`
 }
 
@@ -53,6 +58,16 @@ func (d *instanceTypesData) Schema(ctx context.Context, req datasource.SchemaReq
 			"id": schema.StringAttribute{
 				Description: "Identifier",
 				Computed:    true,
+			},
+			"filter": schema.SingleNestedAttribute{
+				Description: "Filter the instance types",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"region": schema.StringAttribute{
+						Description: "Filter by region name",
+						Optional:    true,
+					},
+				},
 			},
 			"instance_types": schema.MapNestedAttribute{
 				Description: "Available instance types",
@@ -129,6 +144,18 @@ func (d *instanceTypesData) Read(ctx context.Context, req datasource.ReadRequest
 	model.InstanceTypes = make(map[string]*instanceTypeModel)
 
 	for name, info := range res.Data {
+		if model.Filter != nil && !model.Filter.Region.IsNull() {
+			hasRegion := false
+			for _, region := range info.RegionsWithCapacityAvailable {
+				if region.Name == model.Filter.Region.ValueString() {
+					hasRegion = true
+					break
+				}
+			}
+			if !hasRegion {
+				continue
+			}
+		}
 		instanceType := info.InstanceType
 		model.InstanceTypes[name] = &instanceTypeModel{
 			Name:              types.StringValue(instanceType.Name),
