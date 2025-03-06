@@ -35,6 +35,25 @@ func (c *Client) RetrieveInstance(ctx context.Context, req *RetrieveInstanceRequ
 	return &res, nil
 }
 
+type ListInstanceTypesResponse struct {
+	Data map[string]InstanceTypeInfo `json:"data"`
+}
+
+// ListInstanceTypes returns a list of available instance types
+func (c *Client) ListInstanceTypes(ctx context.Context) (*ListInstanceTypesResponse, error) {
+	resp, err := c.Get(ctx, "/instance-types", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var res ListInstanceTypesResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
 type LaunchInstanceRequest struct {
 	Name             *string  `json:"name,omitempty"`
 	RegionName       string   `json:"region_name"`
