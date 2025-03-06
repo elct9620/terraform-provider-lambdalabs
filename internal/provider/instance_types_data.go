@@ -26,10 +26,10 @@ type instanceTypeSpecsModel struct {
 }
 
 type instanceTypeModel struct {
-	Name              types.String          `tfsdk:"name"`
-	Description       types.String          `tfsdk:"description"`
-	GPUDescription    types.String          `tfsdk:"gpu_description"`
-	PriceCentsPerHour types.Int64          `tfsdk:"price_cents_per_hour"`
+	Name              types.String            `tfsdk:"name"`
+	Description       types.String            `tfsdk:"description"`
+	GPUDescription    types.String            `tfsdk:"gpu_description"`
+	PriceCentsPerHour types.Int64             `tfsdk:"price_cents_per_hour"`
 	Specs             *instanceTypeSpecsModel `tfsdk:"specs"`
 }
 
@@ -38,9 +38,9 @@ type instanceTypesFilterModel struct {
 }
 
 type instanceTypesDataModel struct {
-	ID            types.String                     `tfsdk:"id"`
-	Filter        *instanceTypesFilterModel        `tfsdk:"filter"`
-	InstanceTypes map[string]*instanceTypeModel    `tfsdk:"instance_types"`
+	Id            types.String                  `tfsdk:"id"`
+	Filter        *instanceTypesFilterModel     `tfsdk:"filter"`
+	InstanceTypes map[string]*instanceTypeModel `tfsdk:"instance_types"`
 }
 
 func NewInstanceTypesData() datasource.DataSource {
@@ -56,7 +56,7 @@ func (d *instanceTypesData) Schema(ctx context.Context, req datasource.SchemaReq
 		MarkdownDescription: "Instance Types Data",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				Description: "Identifier",
+				Description: "Region Name",
 				Computed:    true,
 			},
 			"filter": schema.SingleNestedAttribute{
@@ -65,7 +65,7 @@ func (d *instanceTypesData) Schema(ctx context.Context, req datasource.SchemaReq
 				Attributes: map[string]schema.Attribute{
 					"region": schema.StringAttribute{
 						Description: "Filter by region name",
-						Optional:    true,
+						Required:    true,
 					},
 				},
 			},
@@ -140,22 +140,30 @@ func (d *instanceTypesData) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	model.ID = types.StringValue("instance_types")
+	hasFilter := model.Filter != nil && !model.Filter.Region.IsNull()
+	regionName := model.Filter.Region.ValueString()
+
 	model.InstanceTypes = make(map[string]*instanceTypeModel)
+	model.Id = types.StringValue("all")
+	if hasFilter {
+		model.Id = types.StringValue(regionName)
+	}
 
 	for name, info := range res.Data {
-		if model.Filter != nil && !model.Filter.Region.IsNull() {
-			hasRegion := false
+		if hasFilter {
+			isRegionAvailable := false
 			for _, region := range info.RegionsWithCapacityAvailable {
-				if region.Name == model.Filter.Region.ValueString() {
-					hasRegion = true
+				if region.Name == regionName {
+					isRegionAvailable = true
 					break
 				}
 			}
-			if !hasRegion {
+
+			if !isRegionAvailable {
 				continue
 			}
 		}
+
 		instanceType := info.InstanceType
 		model.InstanceTypes[name] = &instanceTypeModel{
 			Name:              types.StringValue(instanceType.Name),

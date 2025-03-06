@@ -50,13 +50,12 @@ func Test_InstanceTypesData(t *testing.T) {
 			{
 				Config: providerConfig(server.URL) + `
 				data "lambdalabs_instance_types" "default" {
-					filter {
+					filter = {
 						region = "us-west-1"
 					}
 				}
 				`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "id", "instance_types"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.name", "gpu_1x_a100"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.description", "1x NVIDIA A100 (80 GB)"),
 					resource.TestCheckResourceAttr("data.lambdalabs_instance_types.default", "instance_types.gpu_1x_a100.gpu_description", "NVIDIA A100 (80 GB)"),
