@@ -51,3 +51,16 @@ type FileSystem struct {
 	Region     Region  `json:"region"`
 	BytesUsed  int64   `json:"bytes_used"`
 }
+
+// Image represents a Lambda Labs image
+type Image struct {
+	ID           string  `json:"id"`
+	CreatedTime  string  `json:"created_time"`
+	UpdatedTime  string  `json:"updated_time"`
+	Name         string  `json:"name"`
+	Description  string  `json:"description"`
+	Family       string  `json:"family"`
+	Version      string  `json:"version"`
+	Architecture string  `json:"architecture"`
+	Region       Region  `json:"region"`
+}
