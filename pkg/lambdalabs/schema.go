@@ -32,3 +32,22 @@ type InstanceTypeInfo struct {
 	InstanceType                 InstanceType `json:"instance_type"`
 	RegionsWithCapacityAvailable []Region     `json:"regions_with_capacity_available"`
 }
+
+// User represents a Lambda Labs user
+type User struct {
+	ID     string `json:"id"`
+	Email  string `json:"email"`
+	Status string `json:"status"`
+}
+
+// FileSystem represents a Lambda Labs file system
+type FileSystem struct {
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
+	MountPoint string  `json:"mount_point"`
+	Created    string  `json:"created"`
+	CreatedBy  User    `json:"created_by"`
+	IsInUse    bool    `json:"is_in_use"`
+	Region     Region  `json:"region"`
+	BytesUsed  int64   `json:"bytes_used"`
+}
