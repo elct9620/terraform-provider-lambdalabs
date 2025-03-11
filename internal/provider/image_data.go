@@ -35,8 +35,15 @@ type imageDataModel struct {
 	Region       *imageRegionModel `tfsdk:"region"`
 }
 
+type imagesFilterModel struct {
+	Region       types.String `tfsdk:"region"`
+	Family       types.String `tfsdk:"family"`
+	Architecture types.String `tfsdk:"architecture"`
+}
+
 type imagesDataModel struct {
 	Id     types.String        `tfsdk:"id"`
+	Filter *imagesFilterModel  `tfsdk:"filter"`
 	Images []imageDataModel    `tfsdk:"images"`
 }
 
@@ -55,6 +62,24 @@ func (d *imageData) Schema(ctx context.Context, req datasource.SchemaRequest, re
 			"id": schema.StringAttribute{
 				Description: "Identifier",
 				Computed:    true,
+			},
+			"filter": schema.SingleNestedAttribute{
+				Description: "Filter the images",
+				Optional:    true,
+				Attributes: map[string]schema.Attribute{
+					"region": schema.StringAttribute{
+						Description: "Filter by region name",
+						Optional:    true,
+					},
+					"family": schema.StringAttribute{
+						Description: "Filter by image family",
+						Optional:    true,
+					},
+					"architecture": schema.StringAttribute{
+						Description: "Filter by architecture",
+						Optional:    true,
+					},
+				},
 			},
 			"images": schema.ListNestedAttribute{
 				Description: "List of available images",
@@ -135,8 +160,38 @@ func (d *imageData) Read(ctx context.Context, req datasource.ReadRequest, resp *
 		return
 	}
 
-	images := make([]imageDataModel, 0, len(res.Data))
-	for _, image := range res.Data {
+	// Apply filters if provided
+	filteredImages := res.Data
+	if model.Filter != nil {
+		filteredImages = []api.Image{}
+		for _, image := range res.Data {
+			// Filter by region if specified
+			if !model.Filter.Region.IsNull() && model.Filter.Region.ValueString() != "" {
+				if image.Region.Name != model.Filter.Region.ValueString() {
+					continue
+				}
+			}
+			
+			// Filter by family if specified
+			if !model.Filter.Family.IsNull() && model.Filter.Family.ValueString() != "" {
+				if image.Family != model.Filter.Family.ValueString() {
+					continue
+				}
+			}
+			
+			// Filter by architecture if specified
+			if !model.Filter.Architecture.IsNull() && model.Filter.Architecture.ValueString() != "" {
+				if image.Architecture != model.Filter.Architecture.ValueString() {
+					continue
+				}
+			}
+			
+			filteredImages = append(filteredImages, image)
+		}
+	}
+
+	images := make([]imageDataModel, 0, len(filteredImages))
+	for _, image := range filteredImages {
 		images = append(images, imageDataModel{
 			Id:           types.StringValue(image.ID),
 			Name:         types.StringValue(image.Name),
