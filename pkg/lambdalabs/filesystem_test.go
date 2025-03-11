@@ -279,7 +279,10 @@ func TestCreateFileSystem(t *testing.T) {
 				// Verify request body
 				body, _ := io.ReadAll(r.Body)
 				var req map[string]interface{}
-				json.Unmarshal(body, &req)
+				if err := json.Unmarshal(body, &req); err != nil {
+					t.Errorf("Failed to unmarshal request body: %v", err)
+					return
+				}
 
 				if req["name"] != "my-filesystem" || req["region"] != "us-west-1" {
 					t.Errorf("Expected request with name 'my-filesystem' and region 'us-west-1', got %v", req)
