@@ -147,6 +147,7 @@ func (p *lambdalabsProvider) DataSources(_ context.Context) []func() datasource.
 	return []func() datasource.DataSource{
 		NewSshKeyData,
 		NewInstanceTypesData,
+		NewImageData,
 	}
 }
 
