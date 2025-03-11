@@ -74,7 +74,7 @@ func Test_ImagesData(t *testing.T) {
 			{
 				Config: providerConfig(server.URL) + `
 				data "lambdalabs_images" "filtered_by_region" {
-					filter {
+					filter = {
 						region = "us-west-1"
 					}
 				}
@@ -90,7 +90,7 @@ func Test_ImagesData(t *testing.T) {
 			{
 				Config: providerConfig(server.URL) + `
 				data "lambdalabs_images" "filtered_by_family" {
-					filter {
+					filter = {
 						family = "pytorch"
 					}
 				}
@@ -106,7 +106,7 @@ func Test_ImagesData(t *testing.T) {
 			{
 				Config: providerConfig(server.URL) + `
 				data "lambdalabs_images" "filtered_by_architecture" {
-					filter {
+					filter = {
 						architecture = "x86_64"
 					}
 				}
@@ -119,7 +119,7 @@ func Test_ImagesData(t *testing.T) {
 			{
 				Config: providerConfig(server.URL) + `
 				data "lambdalabs_images" "filtered_multiple" {
-					filter {
+					filter = {
 						region = "us-west-1"
 						family = "ubuntu-lts"
 					}
