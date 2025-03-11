@@ -56,3 +56,30 @@ func (c *Client) CreateFileSystem(ctx context.Context, req *CreateFileSystemRequ
 
 	return &res, nil
 }
+
+// DeleteFileSystemRequest represents the request to delete a file system
+type DeleteFileSystemRequest struct {
+	ID string `json:"id"`
+}
+
+// DeleteFileSystemResponse represents the response from the Delete File System API
+type DeleteFileSystemResponse struct {
+	Data struct {
+		DeletedIDs []string `json:"deleted_ids"`
+	} `json:"data"`
+}
+
+// DeleteFileSystem deletes a file system by ID
+func (c *Client) DeleteFileSystem(ctx context.Context, req *DeleteFileSystemRequest) (*DeleteFileSystemResponse, error) {
+	resp, err := c.Delete(ctx, "/file-systems/"+req.ID, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var res DeleteFileSystemResponse
+	if err = json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}

@@ -128,6 +128,139 @@ func TestListFileSystems(t *testing.T) {
 	}
 }
 
+func TestDeleteFileSystem(t *testing.T) {
+	cases := []struct {
+		name     string
+		request  *lambdalabs.DeleteFileSystemRequest
+		handler  http.HandlerFunc
+		expected *lambdalabs.DeleteFileSystemResponse
+		err      error
+	}{
+		{
+			name: "success",
+			request: &lambdalabs.DeleteFileSystemRequest{
+				ID: "398578a2336b49079e74043f0bd2cfe8",
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"data": map[string]interface{}{
+						"deleted_ids": []string{"398578a2336b49079e74043f0bd2cfe8"},
+					},
+				})
+			},
+			expected: &lambdalabs.DeleteFileSystemResponse{
+				Data: struct {
+					DeletedIDs []string `json:"deleted_ids"`
+				}{
+					DeletedIDs: []string{"398578a2336b49079e74043f0bd2cfe8"},
+				},
+			},
+			err: nil,
+		},
+		{
+			name: "bad request - filesystem in use",
+			request: &lambdalabs.DeleteFileSystemRequest{
+				ID: "398578a2336b49079e74043f0bd2cfe8",
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"error": map[string]string{
+						"code":       "filesystems/filesystem-in-use",
+						"message":    "The filesystem is currently in use by an instance",
+						"suggestion": "Terminate the instance before deleting the filesystem",
+					},
+				})
+			},
+			expected: nil,
+			err:      &lambdalabs.Error{Message: "The filesystem is currently in use by an instance"},
+		},
+		{
+			name: "unauthorized",
+			request: &lambdalabs.DeleteFileSystemRequest{
+				ID: "398578a2336b49079e74043f0bd2cfe8",
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusUnauthorized)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"error": map[string]string{
+						"code":       "global/invalid-api-key",
+						"message":    "API key was invalid, expired, or deleted.",
+						"suggestion": "Check your API key or create a new one, then try again.",
+					},
+				})
+			},
+			expected: nil,
+			err:      &lambdalabs.Error{Message: "API key was invalid, expired, or deleted."},
+		},
+		{
+			name: "forbidden",
+			request: &lambdalabs.DeleteFileSystemRequest{
+				ID: "398578a2336b49079e74043f0bd2cfe8",
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusForbidden)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"error": map[string]string{
+						"code":       "global/account-inactive",
+						"message":    "Your account is inactive.",
+						"suggestion": "Make sure you have verified your email address and have a valid payment method. Contact Support if problems continue.",
+					},
+				})
+			},
+			expected: nil,
+			err:      &lambdalabs.Error{Message: "Your account is inactive."},
+		},
+		{
+			name: "not found",
+			request: &lambdalabs.DeleteFileSystemRequest{
+				ID: "nonexistent-id",
+			},
+			handler: func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusNotFound)
+				json.NewEncoder(w).Encode(map[string]interface{}{ // nolint:errcheck
+					"error": map[string]string{
+						"code":       "global/object-does-not-exist",
+						"message":    "Filesystem was not found.",
+						"suggestion": "Check the filesystem ID and try again.",
+					},
+				})
+			},
+			expected: nil,
+			err:      &lambdalabs.Error{Message: "Filesystem was not found."},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/file-systems/" + c.request.ID
+				if r.URL.Path != expectedPath {
+					t.Errorf("Expected path %q, got %q", expectedPath, r.URL.Path)
+				}
+				if r.Method != http.MethodDelete {
+					t.Errorf("Expected method %q, got %q", http.MethodDelete, r.Method)
+				}
+
+				c.handler(w, r)
+			}))
+			defer server.Close()
+
+			client := lambdalabs.New("test-key", lambdalabs.WithBaseUrl(server.URL))
+			result, err := client.DeleteFileSystem(context.Background(), c.request)
+
+			if !reflect.DeepEqual(c.expected, result) {
+				t.Errorf("Expected %+v, got %+v", c.expected, result)
+			}
+
+			if err != nil && c.err != nil && err.Error() != c.err.Error() {
+				t.Errorf("Expected error %v, got %v", c.err, err)
+			}
+		})
+	}
+}
+
 func TestCreateFileSystem(t *testing.T) {
 	cases := []struct {
 		name     string
