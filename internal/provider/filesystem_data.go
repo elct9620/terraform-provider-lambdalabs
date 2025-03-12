@@ -30,14 +30,14 @@ type filesystemUserModel struct {
 }
 
 type filesystemDataModel struct {
-	ID         types.String         `tfsdk:"id"`
-	Name       types.String         `tfsdk:"name"`
-	MountPoint types.String         `tfsdk:"mount_point"`
-	Created    types.String         `tfsdk:"created"`
-	CreatedBy  *filesystemUserModel `tfsdk:"created_by"`
-	IsInUse    types.Bool           `tfsdk:"is_in_use"`
+	ID         types.String           `tfsdk:"id"`
+	Name       types.String           `tfsdk:"name"`
+	MountPoint types.String           `tfsdk:"mount_point"`
+	Created    types.String           `tfsdk:"created"`
+	CreatedBy  *filesystemUserModel   `tfsdk:"created_by"`
+	IsInUse    types.Bool             `tfsdk:"is_in_use"`
 	Region     *filesystemRegionModel `tfsdk:"region"`
-	BytesUsed  types.Int64          `tfsdk:"bytes_used"`
+	BytesUsed  types.Int64            `tfsdk:"bytes_used"`
 }
 
 type filesystemsFilterModel struct {
@@ -45,9 +45,9 @@ type filesystemsFilterModel struct {
 }
 
 type filesystemsDataModel struct {
-	ID          types.String           `tfsdk:"id"`
+	ID          types.String            `tfsdk:"id"`
 	Filter      *filesystemsFilterModel `tfsdk:"filter"`
-	FileSystems []filesystemDataModel  `tfsdk:"filesystems"`
+	FileSystems []filesystemDataModel   `tfsdk:"filesystems"`
 }
 
 func NewFilesystemData() datasource.DataSource {
@@ -176,7 +176,7 @@ func (d *filesystemData) Read(ctx context.Context, req datasource.ReadRequest, r
 					continue
 				}
 			}
-			
+
 			filteredFileSystems = append(filteredFileSystems, fs)
 		}
 	}
