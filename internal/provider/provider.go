@@ -148,6 +148,7 @@ func (p *lambdalabsProvider) DataSources(_ context.Context) []func() datasource.
 		NewSshKeyData,
 		NewInstanceTypesData,
 		NewImageData,
+		NewFilesystemData,
 	}
 }
 
