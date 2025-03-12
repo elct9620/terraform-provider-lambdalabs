@@ -202,7 +202,7 @@ func (d *filesystemData) Read(ctx context.Context, req datasource.ReadRequest, r
 		})
 	}
 
-	model.Id = types.StringValue("filesystems")
+	model.ID = types.StringValue("filesystems")
 	model.FileSystems = filesystems
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
