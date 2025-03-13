@@ -19,12 +19,6 @@ type filesystemResource struct {
 	client *api.Client
 }
 
-type filesystemModel struct {
-	ID     types.String `tfsdk:"id"`
-	Name   types.String `tfsdk:"name"`
-	Region types.String `tfsdk:"region"`
-}
-
 func NewFilesystemResource() resource.Resource {
 	return &filesystemResource{}
 }
@@ -66,7 +60,7 @@ func (r *filesystemResource) Configure(_ context.Context, req resource.Configure
 
 // Create creates the resource and sets the initial Terraform state.
 func (r *filesystemResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	var fs filesystemModel
+	var fs filesystemResourceModel
 	diags := req.Plan.Get(ctx, &fs)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -101,7 +95,7 @@ func (r *filesystemResource) Create(ctx context.Context, req resource.CreateRequ
 
 // Read refreshes the Terraform state with the latest data.
 func (r *filesystemResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	var state filesystemModel
+	var state filesystemResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -156,7 +150,7 @@ func (r *filesystemResource) Update(ctx context.Context, req resource.UpdateRequ
 
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *filesystemResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state filesystemModel
+	var state filesystemResourceModel
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

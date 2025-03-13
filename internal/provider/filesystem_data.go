@@ -18,38 +18,6 @@ type filesystemData struct {
 	client *api.Client
 }
 
-type filesystemRegionModel struct {
-	Name        types.String `tfsdk:"name"`
-	Description types.String `tfsdk:"description"`
-}
-
-type filesystemUserModel struct {
-	ID     types.String `tfsdk:"id"`
-	Email  types.String `tfsdk:"email"`
-	Status types.String `tfsdk:"status"`
-}
-
-type filesystemDataModel struct {
-	ID         types.String           `tfsdk:"id"`
-	Name       types.String           `tfsdk:"name"`
-	MountPoint types.String           `tfsdk:"mount_point"`
-	Created    types.String           `tfsdk:"created"`
-	CreatedBy  *filesystemUserModel   `tfsdk:"created_by"`
-	IsInUse    types.Bool             `tfsdk:"is_in_use"`
-	Region     *filesystemRegionModel `tfsdk:"region"`
-	BytesUsed  types.Int64            `tfsdk:"bytes_used"`
-}
-
-type filesystemsFilterModel struct {
-	Region types.String `tfsdk:"region"`
-}
-
-type filesystemsDataModel struct {
-	ID          types.String            `tfsdk:"id"`
-	Filter      *filesystemsFilterModel `tfsdk:"filter"`
-	FileSystems []filesystemDataModel   `tfsdk:"filesystems"`
-}
-
 func NewFilesystemData() datasource.DataSource {
 	return &filesystemData{}
 }
