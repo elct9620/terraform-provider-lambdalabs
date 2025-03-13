@@ -22,4 +22,6 @@ Manage File Systems
 
 ### Read-Only
 
+- `created` (String) The creation timestamp of the file system
 - `id` (String) File System ID
+- `mount_point` (String) The mount point of the file system
