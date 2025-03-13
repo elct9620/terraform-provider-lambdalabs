@@ -1,5 +1,10 @@
 # Coventions
 
+## Comments
+
+- Do not use comments to explain what the code does, use comments to explain why the code does what it does.
+- Only write comments for public functions and types following the [GoDoc](https://blog.golang.org/godoc-documenting-go-code) format.
+
 ## Testing
 
 - Use standard library `testing` package for unit tests.
