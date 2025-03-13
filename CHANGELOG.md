@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.2](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v6.0.1...v6.0.2) (2025-03-13)
+
+
+### Miscellaneous Chores
+
+* release 6.0.2 ([4ccd7d6](https://github.com/elct9620/terraform-provider-lambdalabs/commit/4ccd7d6a6cc992bfa27a3f1955c657f92149f73d))
+
 ## [6.0.1](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.6.0...v6.0.1) (2025-03-13)
 
 
