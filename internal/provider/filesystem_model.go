@@ -32,15 +32,11 @@ type filesystemDataModel struct {
 // filesystemResourceModel represents a filesystem model for resource operations
 // containing fields for creation, management and display
 type filesystemResourceModel struct {
-	ID         types.String          `tfsdk:"id"`
-	Name       types.String          `tfsdk:"name"`
-	Region     types.String          `tfsdk:"region"`
-	MountPoint types.String          `tfsdk:"mount_point"`
-	Created    types.String          `tfsdk:"created"`
-	IsInUse    types.Bool            `tfsdk:"is_in_use"`
-	BytesUsed  types.Int64           `tfsdk:"bytes_used"`
-	CreatedBy  filesystemUserModel   `tfsdk:"created_by"`
-	RegionInfo filesystemRegionModel `tfsdk:"region_info"`
+	ID         types.String `tfsdk:"id"`
+	Name       types.String `tfsdk:"name"`
+	Region     types.String `tfsdk:"region"`
+	MountPoint types.String `tfsdk:"mount_point"`
+	Created    types.String `tfsdk:"created"`
 }
 
 // filesystemsFilterModel represents filtering options for filesystems
