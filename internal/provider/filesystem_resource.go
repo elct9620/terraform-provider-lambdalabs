@@ -138,14 +138,14 @@ func (r *filesystemResource) Create(ctx context.Context, req resource.CreateRequ
 	fs.BytesUsed = types.Int64Value(res.Data.BytesUsed)
 
 	// Set created by user information
-	fs.CreatedBy = userModel{
+	fs.CreatedBy = filesystemUserModel{
 		ID:     types.StringValue(res.Data.CreatedBy.ID),
 		Email:  types.StringValue(res.Data.CreatedBy.Email),
 		Status: types.StringValue(res.Data.CreatedBy.Status),
 	}
 
 	// Set region information
-	fs.RegionInfo = regionModel{
+	fs.RegionInfo = filesystemRegionModel{
 		Name:        types.StringValue(res.Data.Region.Name),
 		Description: types.StringValue(res.Data.Region.Description),
 	}
@@ -202,14 +202,14 @@ func (r *filesystemResource) Read(ctx context.Context, req resource.ReadRequest,
 	state.BytesUsed = types.Int64Value(filesystem.BytesUsed)
 
 	// Set created by user information
-	state.CreatedBy = userModel{
+	state.CreatedBy = filesystemUserModel{
 		ID:     types.StringValue(filesystem.CreatedBy.ID),
 		Email:  types.StringValue(filesystem.CreatedBy.Email),
 		Status: types.StringValue(filesystem.CreatedBy.Status),
 	}
 
 	// Set region information
-	state.RegionInfo = regionModel{
+	state.RegionInfo = filesystemRegionModel{
 		Name:        types.StringValue(filesystem.Region.Name),
 		Description: types.StringValue(filesystem.Region.Description),
 	}
