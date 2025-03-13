@@ -13,7 +13,7 @@ type ListFileSystemsResponse struct {
 
 // ListFileSystems retrieves all file systems for the authenticated user
 func (c *Client) ListFileSystems(ctx context.Context) (*ListFileSystemsResponse, error) {
-	resp, err := c.Get(ctx, "/file-systems", nil)
+	resp, err := c.Get(ctx, "/filesystems", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *Client) CreateFileSystem(ctx context.Context, req *CreateFileSystemRequ
 		return nil, err
 	}
 
-	resp, err := c.Post(ctx, "/file-systems", bytes.NewBuffer(body))
+	resp, err := c.Post(ctx, "/filesystems", bytes.NewBuffer(body))
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ type DeleteFileSystemResponse struct {
 
 // DeleteFileSystem deletes a file system by ID
 func (c *Client) DeleteFileSystem(ctx context.Context, req *DeleteFileSystemRequest) (*DeleteFileSystemResponse, error) {
-	resp, err := c.Delete(ctx, "/file-systems/"+req.ID, nil)
+	resp, err := c.Delete(ctx, "/filesystems/"+req.ID, nil)
 	if err != nil {
 		return nil, err
 	}
