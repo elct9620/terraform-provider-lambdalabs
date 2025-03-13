@@ -45,7 +45,9 @@ func Test_FilesystemResource(t *testing.T) {
 				}
 				`, filesystemId, filesystemName, region)
 				w.Write([]byte(resBody)) //nolint:errcheck
-			} else if r.Method == http.MethodPost {
+			}
+		case "/filesystems":
+			if r.Method == http.MethodPost {
 				// Create file system
 				resBody := fmt.Sprintf(`
 				{
@@ -70,7 +72,7 @@ func Test_FilesystemResource(t *testing.T) {
 				`, filesystemId, filesystemName, region)
 				w.Write([]byte(resBody)) //nolint:errcheck
 			}
-		case fmt.Sprintf("/file-systems/%s", filesystemId):
+		case fmt.Sprintf("/filesystems/%s", filesystemId):
 			if r.Method == http.MethodDelete {
 				// Delete file system
 				resBody := fmt.Sprintf(`
