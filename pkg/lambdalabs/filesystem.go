@@ -13,7 +13,7 @@ type ListFileSystemsResponse struct {
 
 // ListFileSystems retrieves all file systems for the authenticated user
 func (c *Client) ListFileSystems(ctx context.Context) (*ListFileSystemsResponse, error) {
-	resp, err := c.Get(ctx, "/filesystems", nil)
+	resp, err := c.Get(ctx, "/file-systems", nil)
 	if err != nil {
 		return nil, err
 	}

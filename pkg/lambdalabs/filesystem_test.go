@@ -103,8 +103,8 @@ func TestListFileSystems(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.URL.Path != "/filesystems" {
-					t.Errorf("Expected path %q, got %q", "/filesystems", r.URL.Path)
+				if r.URL.Path != "/file-systems" {
+					t.Errorf("Expected path %q, got %q", "/file-systems", r.URL.Path)
 				}
 				if r.Method != http.MethodGet {
 					t.Errorf("Expected method %q, got %q", http.MethodGet, r.Method)
