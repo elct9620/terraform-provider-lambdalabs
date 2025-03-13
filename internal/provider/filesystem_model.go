@@ -4,20 +4,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// 共用的檔案系統區域模型
+// filesystemRegionModel represents a region for a filesystem
 type filesystemRegionModel struct {
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 }
 
-// 共用的檔案系統使用者模型
+// filesystemUserModel represents a user who created a filesystem
 type filesystemUserModel struct {
 	ID     types.String `tfsdk:"id"`
 	Email  types.String `tfsdk:"email"`
 	Status types.String `tfsdk:"status"`
 }
 
-// 共用的檔案系統資料模型
+// filesystemDataModel represents a filesystem with all its attributes
 type filesystemDataModel struct {
 	ID         types.String           `tfsdk:"id"`
 	Name       types.String           `tfsdk:"name"`
@@ -29,19 +29,20 @@ type filesystemDataModel struct {
 	BytesUsed  types.Int64            `tfsdk:"bytes_used"`
 }
 
-// 檔案系統資源模型 (簡化版本，只包含必要欄位)
+// filesystemResourceModel represents a simplified filesystem model for resource operations
+// containing only the necessary fields for creation and management
 type filesystemResourceModel struct {
 	ID     types.String `tfsdk:"id"`
 	Name   types.String `tfsdk:"name"`
 	Region types.String `tfsdk:"region"`
 }
 
-// 檔案系統過濾器模型
+// filesystemsFilterModel represents filtering options for filesystems
 type filesystemsFilterModel struct {
 	Region types.String `tfsdk:"region"`
 }
 
-// 檔案系統資料來源模型
+// filesystemsDataModel represents the data source model for filesystems
 type filesystemsDataModel struct {
 	ID          types.String            `tfsdk:"id"`
 	Filter      *filesystemsFilterModel `tfsdk:"filter"`
