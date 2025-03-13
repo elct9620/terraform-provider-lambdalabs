@@ -156,5 +156,6 @@ func (p *lambdalabsProvider) Resources(_ context.Context) []func() resource.Reso
 	return []func() resource.Resource{
 		NewSshKeyResource,
 		NewInstanceResource,
+		NewFilesystemResource,
 	}
 }
