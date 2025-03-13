@@ -45,6 +45,54 @@ func (r *filesystemResource) Schema(_ context.Context, _ resource.SchemaRequest,
 				MarkdownDescription: "The region where the file system will be created",
 				Required:            true,
 			},
+			"mount_point": schema.StringAttribute{
+				MarkdownDescription: "The mount point of the file system",
+				Computed:            true,
+			},
+			"created": schema.StringAttribute{
+				MarkdownDescription: "The creation timestamp of the file system",
+				Computed:            true,
+			},
+			"is_in_use": schema.BoolAttribute{
+				MarkdownDescription: "Whether the file system is currently in use",
+				Computed:            true,
+			},
+			"bytes_used": schema.Int64Attribute{
+				MarkdownDescription: "The number of bytes used in the file system",
+				Computed:            true,
+			},
+			"created_by": schema.SingleNestedAttribute{
+				MarkdownDescription: "Information about the user who created the file system",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
+						MarkdownDescription: "The ID of the user",
+						Computed:            true,
+					},
+					"email": schema.StringAttribute{
+						MarkdownDescription: "The email of the user",
+						Computed:            true,
+					},
+					"status": schema.StringAttribute{
+						MarkdownDescription: "The status of the user",
+						Computed:            true,
+					},
+				},
+			},
+			"region_info": schema.SingleNestedAttribute{
+				MarkdownDescription: "Detailed information about the region",
+				Computed:            true,
+				Attributes: map[string]schema.Attribute{
+					"name": schema.StringAttribute{
+						MarkdownDescription: "The name of the region",
+						Computed:            true,
+					},
+					"description": schema.StringAttribute{
+						MarkdownDescription: "The description of the region",
+						Computed:            true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -84,6 +132,23 @@ func (r *filesystemResource) Create(ctx context.Context, req resource.CreateRequ
 	fs.ID = types.StringValue(res.Data.ID)
 	fs.Name = types.StringValue(res.Data.Name)
 	fs.Region = types.StringValue(res.Data.Region.Name)
+	fs.MountPoint = types.StringValue(res.Data.MountPoint)
+	fs.Created = types.StringValue(res.Data.Created)
+	fs.IsInUse = types.BoolValue(res.Data.IsInUse)
+	fs.BytesUsed = types.Int64Value(res.Data.BytesUsed)
+	
+	// Set created by user information
+	fs.CreatedBy = userModel{
+		ID:     types.StringValue(res.Data.CreatedBy.ID),
+		Email:  types.StringValue(res.Data.CreatedBy.Email),
+		Status: types.StringValue(res.Data.CreatedBy.Status),
+	}
+	
+	// Set region information
+	fs.RegionInfo = regionModel{
+		Name:        types.StringValue(res.Data.Region.Name),
+		Description: types.StringValue(res.Data.Region.Description),
+	}
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, fs)
@@ -131,6 +196,23 @@ func (r *filesystemResource) Read(ctx context.Context, req resource.ReadRequest,
 	state.ID = types.StringValue(filesystem.ID)
 	state.Name = types.StringValue(filesystem.Name)
 	state.Region = types.StringValue(filesystem.Region.Name)
+	state.MountPoint = types.StringValue(filesystem.MountPoint)
+	state.Created = types.StringValue(filesystem.Created)
+	state.IsInUse = types.BoolValue(filesystem.IsInUse)
+	state.BytesUsed = types.Int64Value(filesystem.BytesUsed)
+	
+	// Set created by user information
+	state.CreatedBy = userModel{
+		ID:     types.StringValue(filesystem.CreatedBy.ID),
+		Email:  types.StringValue(filesystem.CreatedBy.Email),
+		Status: types.StringValue(filesystem.CreatedBy.Status),
+	}
+	
+	// Set region information
+	state.RegionInfo = regionModel{
+		Name:        types.StringValue(filesystem.Region.Name),
+		Description: types.StringValue(filesystem.Region.Description),
+	}
 
 	// Set refreshed state
 	diags = resp.State.Set(ctx, &state)
