@@ -7,10 +7,10 @@ import (
 
 // FirewallRule represents a firewall rule in the Lambda Labs API
 type FirewallRule struct {
-	Protocol      string   `json:"protocol"`
-	PortRange     []int    `json:"port_range"`
-	SourceNetwork string   `json:"source_network"`
-	Description   string   `json:"description"`
+	Protocol      string `json:"protocol"`
+	PortRange     []int  `json:"port_range"`
+	SourceNetwork string `json:"source_network"`
+	Description   string `json:"description"`
 }
 
 // ListFirewallRulesResponse represents the response from the List Firewall Rules API
