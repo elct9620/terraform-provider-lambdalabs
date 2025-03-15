@@ -85,7 +85,7 @@ func TestListFirewallRules(t *testing.T) {
 			}))
 			defer server.Close()
 
-			client := NewClient("test-api-key", WithBaseURL(server.URL))
+			client := New("test-api-key", WithBaseUrl(server.URL))
 			res, err := client.ListFirewallRules(context.Background())
 
 			if c.err {
