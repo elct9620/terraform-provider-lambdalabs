@@ -42,25 +42,25 @@ type User struct {
 
 // FileSystem represents a Lambda Labs file system
 type FileSystem struct {
-	ID         string  `json:"id"`
-	Name       string  `json:"name"`
-	MountPoint string  `json:"mount_point"`
-	Created    string  `json:"created"`
-	CreatedBy  User    `json:"created_by"`
-	IsInUse    bool    `json:"is_in_use"`
-	Region     Region  `json:"region"`
-	BytesUsed  int64   `json:"bytes_used"`
+	ID         string `json:"id"`
+	Name       string `json:"name"`
+	MountPoint string `json:"mount_point"`
+	Created    string `json:"created"`
+	CreatedBy  User   `json:"created_by"`
+	IsInUse    bool   `json:"is_in_use"`
+	Region     Region `json:"region"`
+	BytesUsed  int64  `json:"bytes_used"`
 }
 
 // Image represents a Lambda Labs image
 type Image struct {
-	ID           string  `json:"id"`
-	CreatedTime  string  `json:"created_time"`
-	UpdatedTime  string  `json:"updated_time"`
-	Name         string  `json:"name"`
-	Description  string  `json:"description"`
-	Family       string  `json:"family"`
-	Version      string  `json:"version"`
-	Architecture string  `json:"architecture"`
-	Region       Region  `json:"region"`
+	ID           string `json:"id"`
+	CreatedTime  string `json:"created_time"`
+	UpdatedTime  string `json:"updated_time"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	Family       string `json:"family"`
+	Version      string `json:"version"`
+	Architecture string `json:"architecture"`
+	Region       Region `json:"region"`
 }
