@@ -81,7 +81,7 @@ func TestListFirewallRules(t *testing.T) {
 				} else {
 					w.WriteHeader(http.StatusOK)
 				}
-				w.Write([]byte(c.response))
+				_, _ = w.Write([]byte(c.response))
 			}))
 			defer server.Close()
 
