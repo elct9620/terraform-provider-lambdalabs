@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.0](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v6.0.2...v0.7.0) (2025-03-15)
+
+
+### Features
+
+* Add firewall management package for LambdaLabs infrastructure ([c30a7c5](https://github.com/elct9620/terraform-provider-lambdalabs/commit/c30a7c54e88f1e692de5fa68d20ecd91c1048dc2))
+* Add ListFirewallRules API with tests to Lambda Labs client ([0086efc](https://github.com/elct9620/terraform-provider-lambdalabs/commit/0086efcba4f35c95ac73984da897dd79bcf1cff0))
+
+
+### Bug Fixes
+
+* Correct client initialization function names in firewall test ([315c9f8](https://github.com/elct9620/terraform-provider-lambdalabs/commit/315c9f87f40e1f982415817306ea051d98f35b3c))
+* Handle write error in firewall_test.go by using blank identifiers ([3bf91dd](https://github.com/elct9620/terraform-provider-lambdalabs/commit/3bf91dd8e5b89513c5d911770f0c56f3f7ab7141))
+
+
+### Miscellaneous Chores
+
+* release 0.7.0 ([66b7608](https://github.com/elct9620/terraform-provider-lambdalabs/commit/66b760837f332f87372b894e05a16823015438f4))
+
 ## [6.0.2](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v6.0.1...v6.0.2) (2025-03-13)
 
 
