@@ -7,6 +7,7 @@ import (
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,10 +21,11 @@ const (
 )
 
 var (
-	_                            resource.Resource              = &instanceResource{}
-	_                            resource.ResourceWithConfigure = &instanceResource{}
-	defaultInstanceCreateTimeout                                = 10 * time.Minute
-	instanceCreateDelay                                         = 10 * time.Second
+	_                            resource.Resource                = &instanceResource{}
+	_                            resource.ResourceWithConfigure   = &instanceResource{}
+	_                            resource.ResourceWithImportState = &instanceResource{}
+	defaultInstanceCreateTimeout                                  = 10 * time.Minute
+	instanceCreateDelay                                           = 10 * time.Second
 )
 
 type instanceResource struct {
@@ -219,6 +221,11 @@ func (r *instanceResource) Update(ctx context.Context, req resource.UpdateReques
 		"Error Update Lambdalabs instance",
 		"Unsupported Method",
 	)
+}
+
+// ImportState imports the resource state from Terraform state.
+func (r *instanceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
 // Delete deletes the resource and removes the Terraform state on success.

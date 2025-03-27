@@ -102,6 +102,11 @@ func Test_InstanceResource(t *testing.T) {
 					resource.TestCheckResourceAttr("lambdalabs_instance.default", "timeouts.create", "10s"),
 				),
 			},
+			{
+				ResourceName:      "lambdalabs_instance.default",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

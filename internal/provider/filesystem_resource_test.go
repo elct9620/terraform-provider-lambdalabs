@@ -105,6 +105,11 @@ func Test_FilesystemResource(t *testing.T) {
 					resource.TestCheckResourceAttr("lambdalabs_filesystem.test", "created", "2023-01-01T00:00:00.000Z"),
 				),
 			},
+			{
+				ResourceName:      "lambdalabs_filesystem.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

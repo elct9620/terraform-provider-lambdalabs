@@ -5,14 +5,16 @@ import (
 
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var (
-	_ resource.Resource              = &filesystemResource{}
-	_ resource.ResourceWithConfigure = &filesystemResource{}
+	_ resource.Resource                = &filesystemResource{}
+	_ resource.ResourceWithConfigure   = &filesystemResource{}
+	_ resource.ResourceWithImportState = &filesystemResource{}
 )
 
 type filesystemResource struct {
@@ -158,6 +160,11 @@ func (r *filesystemResource) Update(ctx context.Context, req resource.UpdateRequ
 		"Update Lambdalabs File System",
 		"Unsupported Method",
 	)
+}
+
+// ImportState imports the resource state from Terraform state.
+func (r *filesystemResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
