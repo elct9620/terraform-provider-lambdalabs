@@ -99,3 +99,19 @@ func (c *Client) Delete(ctx context.Context, path string, body io.Reader) (*http
 
 	return assertError(resp)
 }
+
+func (c *Client) Put(ctx context.Context, path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, c.baseUrl+path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return assertError(resp)
+}
