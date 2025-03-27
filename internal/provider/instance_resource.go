@@ -201,6 +201,25 @@ func (r *instanceResource) Read(ctx context.Context, req resource.ReadRequest, r
 	latestInstance := res.Data
 
 	state.IP = types.StringValue(latestInstance.IP)
+	
+	// 確保在導入時設置這些屬性
+	if state.RegionName.IsNull() && latestInstance.Region.Name != "" {
+		state.RegionName = types.StringValue(latestInstance.Region.Name)
+	}
+	
+	if state.InstanceTypeName.IsNull() && latestInstance.InstanceType.Name != "" {
+		state.InstanceTypeName = types.StringValue(latestInstance.InstanceType.Name)
+	}
+	
+	// 設置 SSH 密鑰名稱
+	if state.SSHKeyNames.IsNull() && len(latestInstance.SSHKeyNames) > 0 {
+		state.SSHKeyNames, diags = types.ListValueFrom(ctx, types.StringType, latestInstance.SSHKeyNames)
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+	}
+	
 	state.FileSystemNames, diags = types.ListValueFrom(ctx, types.StringType, latestInstance.FileSystemNames)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
