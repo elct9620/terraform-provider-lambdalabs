@@ -5,14 +5,16 @@ import (
 
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var (
-	_ resource.Resource              = &sshKeyResource{}
-	_ resource.ResourceWithConfigure = &sshKeyResource{}
+	_ resource.Resource                = &sshKeyResource{}
+	_ resource.ResourceWithConfigure   = &sshKeyResource{}
+	_ resource.ResourceWithImportState = &sshKeyResource{}
 )
 
 type sshKeyResource struct {
@@ -162,9 +164,9 @@ func (r *sshKeyResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 // Update updates the resource and sets the updated Terraform state on success.
 func (r *sshKeyResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	resp.Diagnostics.AddWarning(
-		"Update Lambdalabs SSH Key",
+	resp.Diagnostics.AddError(
 		"Unsupported Method",
+		"Update is not supported for Lambdalabs SSH Key",
 	)
 }
 
@@ -187,4 +189,9 @@ func (r *sshKeyResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		)
 		return
 	}
+}
+
+// ImportState imports the resource state from Terraform state.
+func (r *sshKeyResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
