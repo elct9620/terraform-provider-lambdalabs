@@ -149,6 +149,7 @@ func (p *lambdalabsProvider) DataSources(_ context.Context) []func() datasource.
 		NewInstanceTypesData,
 		NewImageData,
 		NewFilesystemData,
+		NewFirewallData,
 	}
 }
 
