@@ -26,7 +26,7 @@ type firewallRuleModel struct {
 }
 
 type firewallDataModel struct {
-	Id    types.String       `tfsdk:"id"`
+	Id    types.String        `tfsdk:"id"`
 	Rules []firewallRuleModel `tfsdk:"rules"`
 }
 
