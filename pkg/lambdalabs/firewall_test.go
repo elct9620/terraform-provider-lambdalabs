@@ -227,7 +227,7 @@ func TestReplaceFirewallRules(t *testing.T) {
 				}
 
 				// 檢查請求內容
-				body, err := io.ReadAll(r.Body)
+				_, err := io.ReadAll(r.Body)
 				if err != nil {
 					t.Fatalf("Failed to read request body: %v", err)
 				}
