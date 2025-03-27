@@ -76,6 +76,11 @@ func Test_SSHKeyResource(t *testing.T) {
 					resource.TestCheckResourceAttr("lambdalabs_ssh_key.default", "id", "0920582c7ff041399e34823a0be62548"),
 				),
 			},
+			{
+				ResourceName:      "lambdalabs_ssh_key.default",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
