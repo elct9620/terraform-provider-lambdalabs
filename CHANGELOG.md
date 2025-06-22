@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.0](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.7.0...v0.8.0) (2025-06-22)
+
+
+### Features
+
+* Add import state support for SSH key resource ([963e3f9](https://github.com/elct9620/terraform-provider-lambdalabs/commit/963e3f9ccf8afc6445fb4f2d2cf1df6e532f9366))
+* Add ImportState support for filesystem and instance resources ([7574956](https://github.com/elct9620/terraform-provider-lambdalabs/commit/7574956adb91244a1ba3d89fbf4ea1566f58d683))
+
+
+### Bug Fixes
+
+* Improve ImportState handling for LambdaLabs instance resource ([caa99ac](https://github.com/elct9620/terraform-provider-lambdalabs/commit/caa99ac15f49eebf8d3399db5d45b1604c30143b))
+
 ## [0.7.0](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v6.0.2...v0.7.0) (2025-03-27)
 
 
