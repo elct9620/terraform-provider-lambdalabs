@@ -104,7 +104,7 @@ func (r *sshKeyResource) Create(ctx context.Context, req resource.CreateRequest,
 	key.ID = types.StringValue(res.Data.Id)
 	key.Name = types.StringValue(res.Data.Name)
 	key.PublicKey = types.StringValue(res.Data.PublicKey)
-	key.PrivateKey = types.StringValue(res.Data.PublicKey)
+	key.PrivateKey = types.StringValue("")
 
 	// Set state to fully populated data
 	diags = resp.State.Set(ctx, key)

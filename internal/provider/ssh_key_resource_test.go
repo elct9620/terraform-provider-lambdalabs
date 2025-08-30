@@ -74,6 +74,8 @@ func Test_SSHKeyResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("lambdalabs_ssh_key.default", "name", "terraform"),
 					resource.TestCheckResourceAttr("lambdalabs_ssh_key.default", "id", "0920582c7ff041399e34823a0be62548"),
+					resource.TestCheckResourceAttr("lambdalabs_ssh_key.default", "public_key", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfKpav4ILY54InZe27G user"),
+					resource.TestCheckResourceAttr("lambdalabs_ssh_key.default", "private_key", ""), // Private key is sensitive and should not be stored
 				),
 			},
 			{
