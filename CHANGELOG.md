@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.1](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.8.0...v0.8.1) (2025-08-30)
+
+
+### Bug Fixes
+
+* ssh resource use public key to set private key ([d363ffa](https://github.com/elct9620/terraform-provider-lambdalabs/commit/d363ffa12a764aa93d7fa3372f52d4aba0c4ac13))
+
 ## [0.8.0](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.7.0...v0.8.0) (2025-06-22)
 
 
