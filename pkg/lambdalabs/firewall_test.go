@@ -75,11 +75,12 @@ func TestListFirewallRules(t *testing.T) {
 					t.Errorf("Expected method %q, got %q", http.MethodGet, r.Method)
 				}
 
-				if c.name == "unauthorized" {
+				switch c.name {
+				case "unauthorized":
 					w.WriteHeader(http.StatusUnauthorized)
-				} else if c.name == "forbidden" {
+				case "forbidden":
 					w.WriteHeader(http.StatusForbidden)
-				} else {
+				default:
 					w.WriteHeader(http.StatusOK)
 				}
 				_, _ = w.Write([]byte(c.response))
@@ -231,7 +232,7 @@ func TestReplaceFirewallRules(t *testing.T) {
 				if err != nil {
 					t.Fatalf("Failed to read request body: %v", err)
 				}
-				defer r.Body.Close()
+				defer func() { _ = r.Body.Close() }()
 
 				// 檢查 Content-Type 標頭
 				contentType := r.Header.Get("Content-Type")
@@ -239,11 +240,12 @@ func TestReplaceFirewallRules(t *testing.T) {
 					t.Errorf("Expected Content-Type %q, got %q", "application/json", contentType)
 				}
 
-				if c.name == "unauthorized" {
+				switch c.name {
+				case "unauthorized":
 					w.WriteHeader(http.StatusUnauthorized)
-				} else if c.name == "forbidden" {
+				case "forbidden":
 					w.WriteHeader(http.StatusForbidden)
-				} else {
+				default:
 					w.WriteHeader(http.StatusOK)
 				}
 				_, _ = w.Write([]byte(c.response))

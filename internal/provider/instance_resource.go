@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
-	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework-timeouts/resource/timeouts"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -29,7 +28,7 @@ var (
 )
 
 type instanceResource struct {
-	client *api.Client
+	client *lambdalabs.Client
 }
 
 type instanceModel struct {
@@ -102,7 +101,7 @@ func (r *instanceResource) Configure(_ context.Context, req resource.ConfigureRe
 		return
 	}
 
-	r.client = req.ProviderData.(*api.Client)
+	r.client = req.ProviderData.(*lambdalabs.Client)
 }
 
 // Create creates the resource and sets the initial Terraform state.
@@ -270,7 +269,7 @@ func (r *instanceResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 }
 
-func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, createTimeout time.Duration) (*api.Instance, error) {
+func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, createTimeout time.Duration) (*lambdalabs.Instance, error) {
 	changeConfig := &helper.StateChangeConf{
 		Pending: []string{
 			InstanceStateBooting,
@@ -293,7 +292,7 @@ func (r *instanceResource) waitInstanceCreated(ctx context.Context, id string, c
 	}
 	raw, err := changeConfig.WaitForStateContext(ctx)
 
-	if v, ok := raw.(*api.Instance); ok {
+	if v, ok := raw.(*lambdalabs.Instance); ok {
 		return v, err
 	}
 

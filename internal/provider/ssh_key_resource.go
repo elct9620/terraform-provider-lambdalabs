@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
-	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -18,7 +17,7 @@ var (
 )
 
 type sshKeyResource struct {
-	client *api.Client
+	client *lambdalabs.Client
 }
 
 type sshKeyModel struct {
@@ -70,7 +69,7 @@ func (r *sshKeyResource) Configure(_ context.Context, req resource.ConfigureRequ
 		return
 	}
 
-	r.client = req.ProviderData.(*api.Client)
+	r.client = req.ProviderData.(*lambdalabs.Client)
 }
 
 // Create creates the resource and sets the initial Terraform state.

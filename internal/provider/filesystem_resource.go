@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
-	api "github.com/elct9620/terraform-provider-lambdalabs/pkg/lambdalabs"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -18,7 +17,7 @@ var (
 )
 
 type filesystemResource struct {
-	client *api.Client
+	client *lambdalabs.Client
 }
 
 func NewFilesystemResource() resource.Resource {
@@ -65,7 +64,7 @@ func (r *filesystemResource) Configure(_ context.Context, req resource.Configure
 		return
 	}
 
-	r.client = req.ProviderData.(*api.Client)
+	r.client = req.ProviderData.(*lambdalabs.Client)
 }
 
 // Create creates the resource and sets the initial Terraform state.
