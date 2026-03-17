@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.2](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.8.1...v0.8.2) (2026-03-17)
+
+
+### Bug Fixes
+
+* upgrade golangci-lint to v2 and fix lint issues ([94ef817](https://github.com/elct9620/terraform-provider-lambdalabs/commit/94ef81768b40250bbb446f3898887c73376c6e0b))
+
 ## [0.8.1](https://github.com/elct9620/terraform-provider-lambdalabs/compare/v0.8.0...v0.8.1) (2025-08-30)
 
 
